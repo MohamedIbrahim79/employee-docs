@@ -123,19 +123,28 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
 
           {/* تاريخ الانتهاء فقط للوثائق العادية */}
           {showExpiryDate && (
-            <div>
-              <label className="label">
-                Ablaufdatum <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                className="input"
-                value={expiryDate}
-                onChange={e => setExpiryDate(e.target.value)}
-                min={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-          )}
+  <div>
+    <label className="label">
+      Ablaufdatum <span className="text-red-500">*</span>
+    </label>
+    {docNameDe === 'Bankkarte / IBAN' ? (
+      <input
+        type="month"
+        className="input"
+        value={expiryDate ? expiryDate.substring(0, 7) : ''}
+        onChange={e => setExpiryDate(e.target.value + '-01')}
+      />
+    ) : (
+      <input
+        type="date"
+        className="input"
+        value={expiryDate}
+        onChange={e => setExpiryDate(e.target.value)}
+        min={new Date().toISOString().split('T')[0]}
+      />
+    )}
+  </div>
+)}
 
           {/* تاريخ الإصدار فقط لشهادة حسن السيرة */}
           {isIssueDateOnly && (
