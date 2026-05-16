@@ -15,7 +15,7 @@ export default function EmployeeDetail() {
 
   async function load() {
     setLoading(true)
-    const res = await fetch(`/api/employees/${id}`)
+    const res = await fetch(`/api/employees/${id}`, { credentials: 'include' })
     const data = await res.json()
     setEmployee(data)
     setLoading(false)
