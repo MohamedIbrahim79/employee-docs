@@ -16,7 +16,7 @@ async function getAlerts() {
 
   const today = new Date(); today.setHours(0,0,0,0)
   return (data || [])
-    .filter(d => d.user?.is_active)
+    .filter(d => (d.user as any)?.is_active)
     .map(d => ({ ...d, daysLeft: differenceInDays(new Date(d.expiry_date), today) }))
     .filter(d => d.daysLeft <= 30)
     .sort((a, b) => a.daysLeft - b.daysLeft)
