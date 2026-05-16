@@ -13,7 +13,7 @@ interface Props {
 const ISSUE_DATE_ONLY_DOCS = ['Führungszeugnis']
 
 // الوثائق اللي مش محتاجة أي تواريخ
-const NO_DATES_DOCS = ['Personalausweis', 'Versicherungskarte', 'Arbeitserlaubnis', 'Führerschein', 'Bankkarte / IBAN', 'Steuer-ID', 'Sozialversicherungsnummer']
+const NO_DATES_DOCS = ['Steuer-ID', 'Sozialversicherungsnummer']
 
 export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
   const [file, setFile] = useState<File | null>(null)
