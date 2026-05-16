@@ -24,12 +24,12 @@ export async function POST(req: Request) {
 
     const cookieStore = cookies()
     cookieStore.set('auth_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
-    })
+     httpOnly: false,
+     secure: false,
+     sameSite: 'lax',
+     maxAge: 60 * 60 * 24 * 7,
+     path: '/',
+   })
 
     return NextResponse.json({ role: user.role, name: user.full_name })
   } catch (e) {
