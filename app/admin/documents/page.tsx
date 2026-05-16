@@ -83,7 +83,7 @@ export default async function AdminDocuments() {
                     <span className={`badge ${status.cls}`}>{status.label}</span>
                   </td>
                   <td className="table-cell">
-                    <Link href={`/admin/employees/${doc.user?.id}`} className="text-xs text-brand-700 hover:underline">
+                    <Link href={`/admin/employees/${(doc.user as any)?.id}`} className="text-xs text-brand-700 hover:underline">
                       عرض الملف
                     </Link>
                   </td>
