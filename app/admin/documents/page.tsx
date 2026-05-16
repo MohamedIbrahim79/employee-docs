@@ -69,8 +69,8 @@ export default async function AdminDocuments() {
               return (
                 <tr key={doc.id} className="hover:bg-gray-50 transition-colors">
                   <td className="table-cell">
-                    <p className="font-medium text-gray-900">{doc.user?.full_name}</p>
-                    <p className="text-xs text-gray-400">{doc.user?.email}</p>
+                    <p className="font-medium text-gray-900">{(doc.user as any)?.full_name}</p>
+                    <p className="text-xs text-gray-400">{(doc.user as any)?.email}</p>
                   </td>
                   <td className="table-cell">
                     <p className="text-gray-700">{doc.document_type?.name_ar}</p>
