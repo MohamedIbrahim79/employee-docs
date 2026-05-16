@@ -1,0 +1,88 @@
+'use client'
+import { useState, useEffect } from 'react'
+import { getSession } from '@/lib/auth'
+import DocumentCard from '@/components/DocumentCard'
+import UploadModal from '@/components/UploadModal'
+
+export default function EmployeeDocs() {
+  const [docs, setDocs] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [uploadDoc, setUploadDoc] = useState<any>(null)
+  const [userId, setUserId] = useState<string>('')
+
+  async function load() {
+    setLoading(true)
+    // get session from cookie via API
+    const meRes = await fetch('/api/auth/me')
+    const me = await meRes.json()
+    if (me?.id) {
+      setUserId(me.id)
+      const res = await fetch(`/api/documents?user_id=${me.id}`)
+      const data = await res.json()
+      setDocs(Array.isArray(data) ? data : [])
+    }
+    setLoading(false)
+  }
+
+  useEffect(() => { load() }, [])
+
+  const today = new Date(); today.setHours(0,0,0,0)
+  const uploaded = docs.filter(d => d.file_url).length
+  const expiring = docs.filter(d => {
+    if (!d.expiry_date || !d.file_url) return false
+    const days = Math.ceil((new Date(d.expiry_date).getTime() - today.getTime()) / 86400000)
+    return days >= 0 && days <= 30
+  }).length
+  const expired = docs.filter(d => d.expiry_date && d.file_url && new Date(d.expiry_date) < today).length
+  const missing = docs.filter(d => !d.file_url).length
+
+  return (
+    <div className="p-8">
+      <div className="mb-8">
+        <h1 className="page-title">📄 وثائقي</h1>
+        <p className="text-gray-500 text-sm mt-1">ارفع وحدّث وثائقك المطلوبة هنا</p>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-4 mb-8">
+        {[
+          { label: 'مرفوعة', value: uploaded, color: 'text-green-700', icon: '✅' },
+          { label: 'ناقصة', value: missing, color: 'text-gray-600', icon: '📋' },
+          { label: 'تنتهي قريباً', value: expiring, color: 'text-yellow-700', icon: '⏰' },
+          { label: 'منتهية', value: expired, color: 'text-red-700', icon: '🚨' },
+        ].map(s => (
+          <div key={s.label} className="stat-card">
+            <div className="text-xl mb-1">{s.icon}</div>
+            <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+            <div className="text-xs text-gray-500 mt-0.5">{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {loading ? (
+        <div className="text-center py-20 text-gray-400">جارٍ التحميل...</div>
+      ) : (
+        <div className="grid grid-cols-2 gap-4">
+          {docs.map(doc => (
+            <DocumentCard
+              key={doc.id}
+              doc={doc}
+              isAdmin={false}
+              onRefresh={load}
+              onUpload={() => setUploadDoc(doc)}
+            />
+          ))}
+        </div>
+      )}
+
+      {uploadDoc && (
+        <UploadModal
+          doc={uploadDoc}
+          userId={userId}
+          onClose={() => setUploadDoc(null)}
+          onDone={() => { setUploadDoc(null); load() }}
+        />
+      )}
+    </div>
+  )
+}
