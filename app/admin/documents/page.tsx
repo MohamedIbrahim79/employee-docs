@@ -73,8 +73,8 @@ export default async function AdminDocuments() {
                     <p className="text-xs text-gray-400">{(doc.user as any)?.email}</p>
                   </td>
                   <td className="table-cell">
-                    <p className="text-gray-700">{doc.document_type?.name_ar}</p>
-                    <p className="text-xs text-gray-400">{doc.document_type?.name_de}</p>
+                    <p className="text-gray-700">{(doc.document_type as any)?.name_ar}</p>
+                    <p className="text-xs text-gray-400">{(doc.document_type as any)?.name_de}</p>
                   </td>
                   <td className="table-cell text-gray-600">
                     {doc.expiry_date ? new Date(doc.expiry_date).toLocaleDateString('de-DE') : '—'}
