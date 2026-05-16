@@ -1,43 +1,38 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { requireAuth, getSession } from '@/lib/auth'
+import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { sendDocumentUploaded } from '@/lib/email'
 
-// GET documents for a user
 export async function GET(req: Request) {
-  try {
-    const session = await getSession()
-    if (!session) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  const token = getTokenFromRequest(req)
+  const session = token ? verifyToken(token) : null
+  if (!session) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
 
-    const { searchParams } = new URL(req.url)
-    const userId = searchParams.get('user_id') || session.id
+  const { searchParams } = new URL(req.url)
+  const userId = searchParams.get('user_id') || session.id
 
-    if (session.role === 'employee' && userId !== session.id)
-      return NextResponse.json({ error: 'غير مصرح' }, { status: 403 })
+  if (session.role === 'employee' && userId !== session.id)
+    return NextResponse.json({ error: 'غير مصرح' }, { status: 403 })
 
-    const { data, error } = await supabaseAdmin
-      .from('documents')
-      .select(`
-        id, file_url, file_name, file_size, expiry_date, issue_date, status, notes, uploaded_at, updated_at,
-        document_type:document_type_id(id, name_ar, name_de, has_expiry, is_required),
-        reviewer:reviewed_by(full_name)
-      `)
-      .eq('user_id', userId)
-      .order('uploaded_at', { ascending: false })
+  const { data, error } = await supabaseAdmin
+    .from('documents')
+    .select(`
+      id, file_url, file_name, file_size, expiry_date, issue_date, status, notes, uploaded_at, updated_at,
+      document_type:document_type_id(id, name_ar, name_de, has_expiry, is_required)
+    `)
+    .eq('user_id', userId)
+    .order('uploaded_at', { ascending: false })
 
-    if (error) throw error
-    return NextResponse.json(data)
-  } catch {
-    return NextResponse.json({ error: 'خطأ في الخادم' }, { status: 500 })
-  }
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(data)
 }
 
-// POST upload document
 export async function POST(req: Request) {
-  try {
-    const session = await getSession()
-    if (!session) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  const token = getTokenFromRequest(req)
+  const session = token ? verifyToken(token) : null
+  if (!session) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
 
+  try {
     const formData = await req.formData()
     const file = formData.get('file') as File | null
     const documentTypeId = formData.get('document_type_id') as string
@@ -68,7 +63,6 @@ export async function POST(req: Request) {
       fileSize = file.size
     }
 
-    // Upsert document record
     const { data: existing } = await supabaseAdmin
       .from('documents')
       .select('id')
@@ -94,7 +88,6 @@ export async function POST(req: Request) {
       doc = data
     }
 
-    // Notify admin if employee uploaded
     if (session.role === 'employee') {
       const { data: docType } = await supabaseAdmin.from('document_types').select('name_ar').eq('id', documentTypeId).single()
       const { data: admins } = await supabaseAdmin.from('users').select('email').eq('role', 'admin')

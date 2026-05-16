@@ -1,21 +1,10 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
-import { cookies } from 'next/headers'
-import jwt from 'jsonwebtoken'
+import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
-function getUser() {
-  try {
-    const cookieStore = cookies()
-    const token = cookieStore.get('auth_token')?.value
-    if (!token) return null
-    return jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret-key-32-characters') as any
-  } catch {
-    return null
-  }
-}
-
-export async function GET(_: Request, { params }: { params: { id: string } }) {
-  const session = getUser()
+export async function GET(req: Request, { params }: { params: { id: string } }) {
+  const token = getTokenFromRequest(req)
+  const session = token ? verifyToken(token) : null
   if (!session) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
   if (session.role === 'employee' && session.id !== params.id)
     return NextResponse.json({ error: 'غير مصرح' }, { status: 403 })
@@ -40,8 +29,10 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 }
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const session = getUser()
+  const token = getTokenFromRequest(req)
+  const session = token ? verifyToken(token) : null
   if (!session || session.role !== 'admin') return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+
   const body = await req.json()
   const { full_name, position, department, phone, start_date, is_active } = body
   const { data, error } = await supabaseAdmin
@@ -50,13 +41,16 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     .eq('id', params.id)
     .select()
     .single()
+
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
 
-export async function DELETE(_: Request, { params }: { params: { id: string } }) {
-  const session = getUser()
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+  const token = getTokenFromRequest(req)
+  const session = token ? verifyToken(token) : null
   if (!session || session.role !== 'admin') return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+
   await supabaseAdmin.from('users').delete().eq('id', params.id)
   return NextResponse.json({ ok: true })
 }

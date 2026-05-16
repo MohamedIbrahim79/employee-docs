@@ -9,7 +9,7 @@ import clsx from 'clsx'
 export default function AdminSidebar({ user }: { user: UserPayload }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { t, lang } = useLang()
+  const { t } = useLang()
 
   const links = [
     { href: '/admin', label: t('dashboard'), icon: '📊', exact: true },
@@ -19,7 +19,8 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
   ]
 
   async function logout() {
-    await fetch('/api/auth/logout', { method: 'POST' })
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('user_role')
     router.push('/login')
     router.refresh()
   }

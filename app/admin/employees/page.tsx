@@ -18,7 +18,10 @@ export default function AdminEmployees() {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch('/api/employees', { credentials: 'include' })
+      const token = localStorage.getItem('auth_token')
+      const res = await fetch('/api/employees', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       const data = await res.json()
       if (res.ok) setEmployees(Array.isArray(data) ? data : [])
       else setError(data.error || t('serverError'))

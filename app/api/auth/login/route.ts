@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { comparePassword, signToken } from '@/lib/auth'
-import { cookies } from 'next/headers'
 
 export async function POST(req: Request) {
   try {
@@ -22,16 +21,7 @@ export async function POST(req: Request) {
 
     const token = signToken({ id: user.id, email: user.email, role: user.role, full_name: user.full_name })
 
-    const cookieStore = cookies()
-    cookieStore.set('auth_token', token, {
-     httpOnly: false,
-     secure: false,
-     sameSite: 'lax',
-     maxAge: 60 * 60 * 24 * 7,
-     path: '/',
-   })
-
-    return NextResponse.json({ role: user.role, name: user.full_name })
+    return NextResponse.json({ token, role: user.role, name: user.full_name })
   } catch (e) {
     return NextResponse.json({ error: 'خطأ في الخادم' }, { status: 500 })
   }

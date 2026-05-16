@@ -13,13 +13,14 @@ export default function EmployeeDetail() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
+  function getToken() {
+    return localStorage.getItem('auth_token') || ''
+  }
+
   async function load() {
     setLoading(true)
-    const res = await fetch(`/api/employees/${id}`, { 
-      credentials: 'include',
-      headers: {
-        'Cache-Control': 'no-cache'
-      }
+    const res = await fetch(`/api/employees/${id}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
     })
     const data = await res.json()
     setEmployee(data)
@@ -31,20 +32,37 @@ export default function EmployeeDetail() {
   async function sendReminders() {
     setSending(true)
     setMsg('')
-    const res = await fetch('/api/notifications', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: id }) })
+    const res = await fetch('/api/notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ user_id: id })
+    })
     const data = await res.json()
     setMsg(data.message)
     setSending(false)
   }
 
   async function toggleActive() {
-    await fetch(`/api/employees/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...employee, is_active: !employee.is_active }) })
+    await fetch(`/api/employees/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
+      body: JSON.stringify({ ...employee, is_active: !employee.is_active })
+    })
     load()
   }
 
   async function deleteEmployee() {
     setDeleting(true)
-    await fetch(`/api/employees/${id}`, { method: 'DELETE' })
+    await fetch(`/api/employees/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
     router.push('/admin/employees')
   }
 
@@ -97,7 +115,6 @@ export default function EmployeeDetail() {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">

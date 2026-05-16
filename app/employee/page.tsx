@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { getSession } from '@/lib/auth'
 import DocumentCard from '@/components/DocumentCard'
 import UploadModal from '@/components/UploadModal'
 
@@ -10,14 +9,22 @@ export default function EmployeeDocs() {
   const [uploadDoc, setUploadDoc] = useState<any>(null)
   const [userId, setUserId] = useState<string>('')
 
+  function getToken() {
+    return localStorage.getItem('auth_token') || ''
+  }
+
   async function load() {
     setLoading(true)
-    // get session from cookie via API
-    const meRes = await fetch('/api/auth/me')
+    const token = getToken()
+    const meRes = await fetch('/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
     const me = await meRes.json()
     if (me?.id) {
       setUserId(me.id)
-      const res = await fetch(`/api/documents?user_id=${me.id}`)
+      const res = await fetch(`/api/documents?user_id=${me.id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       const data = await res.json()
       setDocs(Array.isArray(data) ? data : [])
     }
@@ -39,17 +46,16 @@ export default function EmployeeDocs() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="page-title">📄 وثائقي</h1>
-        <p className="text-gray-500 text-sm mt-1">ارفع وحدّث وثائقك المطلوبة هنا</p>
+        <h1 className="page-title">📄 Meine Dokumente</h1>
+        <p className="text-gray-500 text-sm mt-1">Laden Sie Ihre erforderlichen Dokumente hoch</p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'مرفوعة', value: uploaded, color: 'text-green-700', icon: '✅' },
-          { label: 'ناقصة', value: missing, color: 'text-gray-600', icon: '📋' },
-          { label: 'تنتهي قريباً', value: expiring, color: 'text-yellow-700', icon: '⏰' },
-          { label: 'منتهية', value: expired, color: 'text-red-700', icon: '🚨' },
+          { label: 'Hochgeladen', value: uploaded, color: 'text-green-700', icon: '✅' },
+          { label: 'Fehlend', value: missing, color: 'text-gray-600', icon: '📋' },
+          { label: 'Läuft bald ab', value: expiring, color: 'text-yellow-700', icon: '⏰' },
+          { label: 'Abgelaufen', value: expired, color: 'text-red-700', icon: '🚨' },
         ].map(s => (
           <div key={s.label} className="stat-card">
             <div className="text-xl mb-1">{s.icon}</div>
@@ -60,7 +66,7 @@ export default function EmployeeDocs() {
       </div>
 
       {loading ? (
-        <div className="text-center py-20 text-gray-400">جارٍ التحميل...</div>
+        <div className="text-center py-20 text-gray-400">Wird geladen...</div>
       ) : (
         <div className="grid grid-cols-2 gap-4">
           {docs.map(doc => (
