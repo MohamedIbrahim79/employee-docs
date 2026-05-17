@@ -16,6 +16,7 @@ export default function EmployeeProfile() {
   const [phone, setPhone] = useState('')
   const [address, setAddress] = useState('')
   const [birthDate, setBirthDate] = useState('')
+  const [editing, setEditing] = useState(false)
 
   function getToken() {
     return localStorage.getItem('auth_token') ||
@@ -50,7 +51,7 @@ export default function EmployeeProfile() {
     })
     const data = await res.json()
     if (!res.ok) setError(data.error)
-    else { setMsg('Passwort erfolgreich geändert ✅'); setCurrentPw(''); setNewPw(''); setConfirmPw('') }
+    else { setMsg('Passwort erfolgreich geändert'); setCurrentPw(''); setNewPw(''); setConfirmPw('') }
     setLoading(false)
   }
 
@@ -58,32 +59,39 @@ export default function EmployeeProfile() {
     e.preventDefault()
     setProfileMsg(''); setProfileError('')
     setProfileLoading(true)
-
-    const payload = {
-      full_name: fullName,
-      phone: phone || null,
-      address: address || null,
-      birth_date: birthDate && birthDate.length > 0 ? birthDate : null,
-    }
-
     const res = await fetch('/api/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        full_name: fullName,
+        phone: phone || null,
+        address: address || null,
+        birth_date: birthDate && birthDate.length > 0 ? birthDate : null,
+      }),
     })
     const data = await res.json()
-
     if (!res.ok) {
       setProfileError(data.error)
     } else {
-      setProfileMsg('Profil erfolgreich gespeichert ✅')
+      setProfileMsg('Profil erfolgreich gespeichert')
       setUser(data)
       setFullName(data.full_name || '')
       setPhone(data.phone || '')
       setAddress(data.address || '')
       setBirthDate(data.birth_date ? data.birth_date.substring(0, 10) : '')
+      setEditing(false)
     }
     setProfileLoading(false)
+  }
+
+  function cancelEdit() {
+    setFullName(user?.full_name || '')
+    setPhone(user?.phone || '')
+    setAddress(user?.address || '')
+    setBirthDate(user?.birth_date ? user.birth_date.substring(0, 10) : '')
+    setEditing(false)
+    setProfileMsg('')
+    setProfileError('')
   }
 
   return (
@@ -92,7 +100,15 @@ export default function EmployeeProfile() {
 
       {/* Profile Info */}
       <div className="card p-6 mb-5">
-        <h2 className="section-title mb-4">Persönliche Daten</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="section-title">Persönliche Daten</h2>
+          {!editing && (
+            <button onClick={() => setEditing(true)} className="btn-secondary text-sm">
+              Bearbeiten
+            </button>
+          )}
+        </div>
+
         <div className="bg-brand-900 rounded-xl p-4 mb-4 flex items-center gap-3">
           <div className="w-12 h-12 bg-brand-700 rounded-full flex items-center justify-center text-white font-bold text-lg">
             {user?.full_name?.charAt(0)}
@@ -102,40 +118,69 @@ export default function EmployeeProfile() {
             <p className="text-sm text-brand-300">{user?.email}</p>
           </div>
         </div>
-        <form onSubmit={saveProfile} className="space-y-4">
+
+        {!editing ? (
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="label">Vollständiger Name</label>
-              <input type="text" className="input" value={fullName} onChange={e => setFullName(e.target.value)} required />
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Vollständiger Name</p>
+              <p className="text-gray-900">{user?.full_name || '—'}</p>
             </div>
             <div className="col-span-2">
-              <label className="label">E-Mail</label>
-              <input type="text" className="input bg-gray-50" value={user?.email || ''} disabled />
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">E-Mail</p>
+              <p className="text-gray-900">{user?.email || '—'}</p>
             </div>
             <div>
-              <label className="label">Telefon</label>
-              <input type="text" className="input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+49 ..." />
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Telefon</p>
+              <p className="text-gray-900">{user?.phone || '—'}</p>
             </div>
             <div>
-              <label className="label">Geburtsdatum</label>
-              <input type="date" className="input" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Geburtsdatum</p>
+              <p className="text-gray-900">{user?.birth_date ? new Date(user.birth_date).toLocaleDateString('de-DE') : '—'}</p>
             </div>
             <div className="col-span-2">
-              <label className="label">Adresse</label>
-              <input type="text" className="input" value={address} onChange={e => setAddress(e.target.value)} placeholder="Musterstraße 1, 12345 Berlin" />
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Adresse</p>
+              <p className="text-gray-900">{user?.address || '—'}</p>
             </div>
           </div>
-          {profileError && <p className="text-red-600 text-sm bg-red-50 px-4 py-3 rounded-lg">{profileError}</p>}
-          {profileMsg && <p className="text-green-700 text-sm bg-green-50 px-4 py-3 rounded-lg">{profileMsg}</p>}
-          <button type="submit" disabled={profileLoading} className="btn-primary">
-            {profileLoading ? 'Wird gespeichert...' : 'Profil speichern'}
-          </button>
-        </form>
+        ) : (
+          <form onSubmit={saveProfile} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="col-span-2">
+                <label className="label">Vollständiger Name</label>
+                <input type="text" className="input" value={fullName} onChange={e => setFullName(e.target.value)} required />
+              </div>
+              <div className="col-span-2">
+                <label className="label">E-Mail</label>
+                <input type="text" className="input bg-gray-50" value={user?.email || ''} disabled />
+              </div>
+              <div>
+                <label className="label">Telefon</label>
+                <input type="text" className="input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+49 ..." />
+              </div>
+              <div>
+                <label className="label">Geburtsdatum</label>
+                <input type="date" className="input" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+              </div>
+              <div className="col-span-2">
+                <label className="label">Adresse</label>
+                <input type="text" className="input" value={address} onChange={e => setAddress(e.target.value)} placeholder="Musterstraße 1, 12345 Berlin" />
+              </div>
+            </div>
+            {profileError && <p className="text-red-600 text-sm bg-red-50 px-4 py-3 rounded-lg">{profileError}</p>}
+            {profileMsg && <p className="text-green-700 text-sm bg-green-50 px-4 py-3 rounded-lg">{profileMsg}</p>}
+            <div className="flex gap-3">
+              <button type="button" onClick={cancelEdit} className="btn-secondary flex-1 justify-center">Abbrechen</button>
+              <button type="submit" disabled={profileLoading} className="btn-primary flex-1 justify-center">
+                {profileLoading ? 'Wird gespeichert...' : 'Speichern'}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
 
       {/* Password */}
       <div className="card p-6 mb-5">
-        <h2 className="section-title mb-4">🔐 Passwort ändern</h2>
+        <h2 className="section-title mb-4">Passwort ändern</h2>
         <form onSubmit={changePassword} className="space-y-4">
           <div>
             <label className="label">Aktuelles Passwort</label>
