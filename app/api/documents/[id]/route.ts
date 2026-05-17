@@ -29,16 +29,15 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const docName = (doc.document_type as any).name_de
   const approved = action === 'approve'
 
-  // إشعار داخلي للموظف
   await supabaseAdmin.from('in_app_notifications').insert({
     user_id: employeeId,
     title: approved ? 'Dokument genehmigt' : 'Dokument abgelehnt',
     message: approved
       ? `Ihr Dokument "${docName}" wurde genehmigt`
       : `Ihr Dokument "${docName}" wurde abgelehnt${notes ? `: ${notes}` : ''}`,
+    metadata: { document_id: params.id }
   })
 
-  // إيميل للموظف
   try {
     await sendDocumentStatus(
       (doc.user as any).email,

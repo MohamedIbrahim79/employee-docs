@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import DocumentCard from '@/components/DocumentCard'
 import UploadModal from '@/components/UploadModal'
 
@@ -8,6 +9,8 @@ export default function EmployeeDocs() {
   const [loading, setLoading] = useState(true)
   const [uploadDoc, setUploadDoc] = useState<any>(null)
   const [userId, setUserId] = useState<string>('')
+  const searchParams = useSearchParams()
+  const highlightDocId = searchParams.get('doc')
 
   function getToken() {
     return localStorage.getItem('auth_token') || ''
@@ -32,6 +35,15 @@ export default function EmployeeDocs() {
   }
 
   useEffect(() => { load() }, [])
+
+  useEffect(() => {
+    if (highlightDocId && !loading) {
+      setTimeout(() => {
+        const el = document.getElementById(`doc-${highlightDocId}`)
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 300)
+    }
+  }, [highlightDocId, loading])
 
   const today = new Date(); today.setHours(0,0,0,0)
   const uploaded = docs.filter(d => d.file_url).length
@@ -69,13 +81,27 @@ export default function EmployeeDocs() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {docs.map(doc => (
-            <DocumentCard
+            <div
               key={doc.id}
-              doc={doc}
-              isAdmin={false}
-              onRefresh={load}
-              onUpload={() => setUploadDoc(doc)}
-            />
+              id={`doc-${doc.id}`}
+              style={highlightDocId === doc.id ? {
+                transform: 'scale(1.03)',
+                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.18)',
+                borderRadius: '12px',
+                position: 'relative',
+                zIndex: 10,
+                transition: 'all 0.3s ease',
+              } : {
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <DocumentCard
+                doc={doc}
+                isAdmin={false}
+                onRefresh={load}
+                onUpload={() => setUploadDoc(doc)}
+              />
+            </div>
           ))}
         </div>
       )}

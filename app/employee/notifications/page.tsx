@@ -1,11 +1,10 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 export default function EmployeeNotifications() {
   const [notifications, setNotifications] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const router = useRouter()
 
   function getToken() {
     return localStorage.getItem('auth_token') ||
@@ -19,12 +18,14 @@ export default function EmployeeNotifications() {
     const data = await res.json()
     setNotifications(Array.isArray(data) ? data : [])
     setLoading(false)
+  }
 
-    // علّم كل الإشعارات كمقروءة
-    await fetch('/api/in-app-notifications', {
+  async function markAsRead(id: string) {
+    await fetch(`/api/in-app-notifications/${id}`, {
       method: 'PATCH',
       headers: { 'Authorization': `Bearer ${getToken()}` }
     })
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n))
   }
 
   useEffect(() => { load() }, [])
@@ -52,6 +53,14 @@ export default function EmployeeNotifications() {
                     {new Date(n.created_at).toLocaleDateString('de-DE')} — {new Date(n.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
+                {n.metadata?.document_id && (
+                  <Link
+                    href={`/employee?doc=${n.metadata.document_id}`}
+                    onClick={() => markAsRead(n.id)}
+                    className="btn-secondary py-1.5 px-3 text-xs shrink-0">
+                    Öffnen
+                  </Link>
+                )}
               </div>
             </div>
           ))}
