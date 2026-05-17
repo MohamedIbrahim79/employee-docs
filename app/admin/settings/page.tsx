@@ -22,19 +22,19 @@ export default function AdminSettings() {
       document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
   }
 
-  useEffect(() => {
-    fetch('/api/auth/me', {
+  async function loadProfile() {
+    const res = await fetch('/api/auth/me', {
       headers: { 'Authorization': `Bearer ${getToken()}` }
     })
-      .then(r => r.json())
-      .then(data => {
-        setUser(data)
-        setFullName(data.full_name || '')
-        setPhone(data.phone || '')
-        setAddress(data.address || '')
-        setBirthDate(data.birth_date ? data.birth_date.split('T')[0] : '')
-      })
-  }, [])
+    const data = await res.json()
+    setUser(data)
+    setFullName(data.full_name || '')
+    setPhone(data.phone || '')
+    setAddress(data.address || '')
+    setBirthDate(data.birth_date ? data.birth_date.substring(0, 10) : '')
+  }
+
+  useEffect(() => { loadProfile() }, [])
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault()
@@ -57,7 +57,7 @@ export default function AdminSettings() {
     e.preventDefault()
     setProfileMsg(''); setProfileError('')
     setProfileLoading(true)
-    const res = await fetch(`/api/profile`, {
+    const res = await fetch('/api/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify({
@@ -68,8 +68,12 @@ export default function AdminSettings() {
       }),
     })
     const data = await res.json()
-    if (!res.ok) setProfileError(data.error)
-    else setProfileMsg('Profil erfolgreich gespeichert ✅')
+    if (!res.ok) {
+      setProfileError(data.error)
+    } else {
+      setProfileMsg('Profil erfolgreich gespeichert ✅')
+      await loadProfile()
+    }
     setProfileLoading(false)
   }
 
@@ -77,7 +81,6 @@ export default function AdminSettings() {
     <div className="p-8 max-w-2xl">
       <h1 className="page-title mb-6">⚙️ Einstellungen</h1>
 
-      {/* Profile */}
       <div className="card p-6 mb-5">
         <h2 className="section-title mb-4">👤 Mein Profil</h2>
         <div className="bg-brand-900 rounded-xl p-4 mb-4 flex items-center gap-3">
@@ -123,7 +126,6 @@ export default function AdminSettings() {
         </form>
       </div>
 
-      {/* Password */}
       <div className="card p-6 mb-5">
         <h2 className="section-title mb-4">🔐 Passwort ändern</h2>
         <form onSubmit={changePassword} className="space-y-4">
@@ -147,7 +149,6 @@ export default function AdminSettings() {
         </form>
       </div>
 
-      {/* Notifications */}
       <div className="card p-6">
         <h2 className="section-title mb-2">📧 Benachrichtigungseinstellungen</h2>
         <p className="text-sm text-gray-500 mb-4">Automatische Benachrichtigungen werden täglich per Cron-Skript gesendet</p>
