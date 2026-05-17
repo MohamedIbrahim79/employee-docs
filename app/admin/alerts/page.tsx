@@ -3,6 +3,8 @@ import { differenceInDays } from 'date-fns'
 import Link from 'next/link'
 import SendAllButton from '@/components/SendAllButton'
 
+export const revalidate = 0
+
 async function getAlerts() {
   const { data } = await supabaseAdmin
     .from('documents')
@@ -30,7 +32,7 @@ export default async function AlertsPage() {
     <div className="p-4 md:p-8">
       <div className="mb-6">
         <h1 className="page-title">Benachrichtigungen</h1>
-        <p className="text-gray-500 text-sm mt-1 mb-4">{alerts.length} Dokumente benötigen  Aufmerksamkeit</p>
+        <p className="text-gray-500 text-sm mt-1 mb-4">{alerts.length} Dokumente benötigen Aufmerksamkeit</p>
         <SendAllButton />
       </div>
 
