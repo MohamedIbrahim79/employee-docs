@@ -12,7 +12,7 @@ export async function PUT(req: Request) {
   const { data, error } = await supabaseAdmin
     .from('users')
     .update({ full_name, phone, address, birth_date: birth_date || null })
-    .eq('id', session.id)
+    .eq('id', session.user.id)
     .select()
     .single()
 
