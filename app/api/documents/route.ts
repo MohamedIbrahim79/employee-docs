@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
-import { sendDocumentUploaded } from '@/lib/email'
 
 export async function GET(req: Request) {
   const token = getTokenFromRequest(req)
@@ -88,22 +87,19 @@ export async function POST(req: Request) {
       doc = data
     }
 
-    // لما الموظف يرفع ملف، ابعت إشعار للـ HR والـ Admin والـ Owner
+    // إشعار داخلي فقط للـ HR والـ Admin والـ Owner
     if (session.role === 'employee') {
       const { data: docType } = await supabaseAdmin.from('document_types').select('name_de').eq('id', documentTypeId).single()
       const { data: employee } = await supabaseAdmin.from('users').select('full_name').eq('id', userId).single()
-      const { data: admins } = await supabaseAdmin.from('users').select('id, email').in('role', ['admin', 'hr', 'owner'])
+      const { data: admins } = await supabaseAdmin.from('users').select('id').in('role', ['admin', 'hr', 'owner'])
 
       for (const admin of admins || []) {
-        // إشعار داخلي
         await supabaseAdmin.from('in_app_notifications').insert({
           user_id: admin.id,
           title: 'Neues Dokument hochgeladen',
           message: `${employee?.full_name} hat ${docType?.name_de} hochgeladen`,
           metadata: { employee_id: userId, document_id: doc?.id }
         })
-        // إيميل
-        try { await sendDocumentUploaded(admin.email, employee?.full_name || '', docType?.name_de || '') } catch {}
       }
     }
 
