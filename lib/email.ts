@@ -29,7 +29,7 @@ function emailTemplate(title: string, body: string): string {
   .f{background:#f9f9f9;padding:16px 32px;text-align:center;font-size:11px;color:#999;border-top:1px solid #eee}
 </style></head>
 <body><div class="c">
-  <div class="h"><h1>🏢 ${COMPANY}</h1><p>Mitarbeiter-Dokumentenverwaltung</p></div>
+  <div class="h"><h1>${COMPANY}</h1></div>
   <div class="b"><h2 style="margin-top:0;color:#1a2744">${title}</h2>${body}
     <a href="${SITE_URL}/employee" class="cta">Anmelden und Dokument hochladen</a>
   </div>
