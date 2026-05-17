@@ -6,7 +6,8 @@ import { sendDocumentStatus } from '@/lib/email'
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session || session.role !== 'admin') return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  if (!session || !['admin', 'owner', 'hr'].includes(session.role)) 
+    return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   const { action, notes } = await req.json()
   const status = action === 'approve' ? 'active' : 'rejected'
@@ -18,7 +19,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     .select(`
       id, status,
       user:user_id(email, full_name),
-      document_type:document_type_id(name_ar)
+      document_type:document_type_id(name_ar, name_de)
     `)
     .single()
 
@@ -28,7 +29,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     await sendDocumentStatus(
       (doc.user as any).email,
       (doc.user as any).full_name,
-      (doc.document_type as any).name_ar,
+      (doc.document_type as any).name_de,
       action === 'approve',
       notes
     )
@@ -40,8 +41,12 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session || session.role !== 'admin') return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  if (!session || !['admin', 'owner', 'hr'].includes(session.role)) 
+    return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
-  await supabaseAdmin.from('documents').update({ file_url: null, file_name: null, status: 'pending' }).eq('id', params.id)
+  await supabaseAdmin.from('documents')
+    .update({ file_url: null, file_name: null, status: 'pending' })
+    .eq('id', params.id)
+
   return NextResponse.json({ ok: true })
 }
