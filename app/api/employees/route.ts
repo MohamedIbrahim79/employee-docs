@@ -21,7 +21,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session || !['admin', 'owner'].includes(session.role)) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
+  if (!session || !['admin', 'owner', 'hr'].includes(session.role)) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   try {
     const body = await req.json()

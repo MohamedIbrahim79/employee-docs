@@ -5,9 +5,9 @@ import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  if (!session) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
   if (session.role === 'employee' && session.id !== params.id)
-    return NextResponse.json({ error: 'غير مصرح' }, { status: 403 })
+    return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 403 })
 
   const { data: userData, error: userError } = await supabaseAdmin
     .from('users')
@@ -15,7 +15,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     .eq('id', params.id)
     .single()
 
-  if (userError || !userData) return NextResponse.json({ error: 'الموظف غير موجود' }, { status: 404 })
+  if (userError || !userData) return NextResponse.json({ error: 'Mitarbeiter nicht gefunden' }, { status: 404 })
 
   const { data: docs } = await supabaseAdmin
     .from('documents')
@@ -31,11 +31,10 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session || session.role !== 'admin') return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  if (!session || !['admin', 'owner', 'hr'].includes(session.role)) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   const body = await req.json()
   const { full_name, position, department, phone, start_date, birth_date, address, is_active } = body
-
   const { data, error } = await supabaseAdmin
     .from('users')
     .update({ full_name, position, department, phone, start_date, birth_date, address, is_active })
@@ -50,7 +49,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session || session.role !== 'admin') return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  if (!session || !['admin', 'owner', 'hr'].includes(session.role)) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   await supabaseAdmin.from('users').delete().eq('id', params.id)
   return NextResponse.json({ ok: true })
