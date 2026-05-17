@@ -175,7 +175,7 @@ export default function EmployeeDetail() {
                 key={doc.id}
                 id={`doc-${doc.id}`}
                 className={highlightDocId === doc.id
-                  ? 'ring-4 ring-[#c9a84c] rounded-xl shadow-lg shadow-yellow-100 bg-yellow-50'
+                  ? 'outline outline-4 outline-offset-2 outline-[#c9a84c] rounded-xl'
                   : ''}
               >
                 <DocumentCard doc={doc} isAdmin={true} onRefresh={load} />
