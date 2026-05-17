@@ -57,17 +57,24 @@ export default function AdminSettings() {
     e.preventDefault()
     setProfileMsg(''); setProfileError('')
     setProfileLoading(true)
+
+    const payload = {
+      full_name: fullName,
+      phone: phone || null,
+      address: address || null,
+      birth_date: birthDate && birthDate.length > 0 ? birthDate : null,
+    }
+
+    console.log('Saving profile:', payload)
+
     const res = await fetch('/api/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-      body: JSON.stringify({
-        full_name: fullName,
-        phone,
-        address,
-        birth_date: birthDate || null,
-      }),
+      body: JSON.stringify(payload),
     })
     const data = await res.json()
+    console.log('Profile response:', data)
+
     if (!res.ok) {
       setProfileError(data.error)
     } else {
@@ -111,7 +118,15 @@ export default function AdminSettings() {
             </div>
             <div>
               <label className="label">Geburtsdatum</label>
-              <input type="date" className="input" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+              <input
+                type="date"
+                className="input"
+                value={birthDate}
+                onChange={e => {
+                  console.log('birth_date changed:', e.target.value)
+                  setBirthDate(e.target.value)
+                }}
+              />
             </div>
             <div className="col-span-2">
               <label className="label">Adresse</label>
