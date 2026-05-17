@@ -87,10 +87,7 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-bold text-gray-900">{doc.document_type?.name_de}</h2>
-              <p className="text-sm text-gray-400">{doc.document_type?.name_ar}</p>
-            </div>
+            <h2 className="font-bold text-gray-900">{doc.document_type?.name_de}</h2>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
           </div>
         </div>
@@ -107,14 +104,12 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
               <input {...getInputProps()} />
               {file ? (
                 <div>
-                  <div className="text-3xl mb-2">{file.type === 'application/pdf' ? '📄' : '🖼️'}</div>
                   <p className="font-medium text-green-700 text-sm">{file.name}</p>
                   <p className="text-xs text-gray-400 mt-1">{fileSizeMB} MB</p>
                   <p className="text-xs text-brand-600 mt-2">Klicken Sie, um eine andere Datei auszuwählen</p>
                 </div>
               ) : (
                 <div>
-                  <div className="text-4xl mb-3">📁</div>
                   <p className="font-medium text-gray-600 text-sm">Datei hier ablegen oder klicken</p>
                   <p className="text-xs text-gray-400 mt-1">JPG · PNG · PDF · max. 10MB</p>
                 </div>
@@ -158,14 +153,14 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
                 onChange={e => setIssueDate(e.target.value)}
               />
               <p className="text-xs text-gray-400 mt-1">
-                ⏰ Gültigkeitsdauer: 6 Monate ab Ausstellungsdatum
+                Gültigkeitsdauer: 6 Monate ab Ausstellungsdatum
               </p>
             </div>
           )}
 
           {error && (
             <div className="bg-red-50 text-red-700 text-sm px-4 py-3 rounded-lg">
-              ⚠️ {error}
+              {error}
             </div>
           )}
 
@@ -185,7 +180,7 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
         <div className="p-6 pt-0 flex gap-3">
           <button onClick={onClose} className="btn-secondary flex-1 justify-center">Abbrechen</button>
           <button onClick={handleUpload} disabled={uploading} className="btn-primary flex-1 justify-center">
-            {uploading ? 'Wird hochgeladen...' : '⬆️ Dokument hochladen'}
+            {uploading ? 'Wird hochgeladen...' : 'Dokument hochladen'}
           </button>
         </div>
       </div>
