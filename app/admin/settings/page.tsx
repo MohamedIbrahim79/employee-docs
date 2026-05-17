@@ -107,26 +107,28 @@ export default function AdminSettings() {
       {/* Profile Card */}
       <div className="card overflow-hidden mb-6">
         {/* Header */}
-        <div className="bg-brand-900 px-6 py-8 relative">
-          <div className="flex items-end gap-4">
-            <div className="w-20 h-20 bg-[#c9a84c] rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-lg">
+        <div className="bg-brand-900 px-6 py-6">
+          <div className="flex items-start gap-4">
+            <div className="w-16 h-16 bg-[#c9a84c] rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg shrink-0">
               {user?.full_name?.charAt(0)}
             </div>
-            <div className="pb-1">
-              <h2 className="text-xl font-bold text-white">{user?.full_name}</h2>
-              <p className="text-brand-300 text-sm">{user?.email}</p>
-              <span className="text-xs bg-white/20 text-white px-3 py-0.5 rounded-full mt-1.5 inline-block">
-                {getRoleLabel(user?.role || '')}
-              </span>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold text-white truncate">{user?.full_name}</h2>
+              <p className="text-brand-300 text-sm truncate">{user?.email}</p>
+              <div className="flex items-center gap-2 mt-2 flex-wrap">
+                <span className="text-xs bg-white/20 text-white px-3 py-0.5 rounded-full">
+                  {getRoleLabel(user?.role || '')}
+                </span>
+                {!editing && (
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-0.5 rounded-full transition-colors">
+                    Bearbeiten
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-          {!editing && (
-            <button
-              onClick={() => setEditing(true)}
-              className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-lg transition-colors">
-              Bearbeiten
-            </button>
-          )}
         </div>
 
         {/* Body */}
