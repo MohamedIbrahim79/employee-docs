@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function EmployeeProfile() {
   const [currentPw, setCurrentPw] = useState('')
@@ -8,11 +8,34 @@ export default function EmployeeProfile() {
   const [msg, setMsg] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<any>(null)
+  const [profileMsg, setProfileMsg] = useState('')
+  const [profileError, setProfileError] = useState('')
+  const [profileLoading, setProfileLoading] = useState(false)
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [address, setAddress] = useState('')
+  const [birthDate, setBirthDate] = useState('')
 
   function getToken() {
     return localStorage.getItem('auth_token') ||
       document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
   }
+
+  async function loadProfile() {
+    const res = await fetch(`/api/auth/me?t=${Date.now()}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` },
+      cache: 'no-store'
+    })
+    const data = await res.json()
+    setUser(data)
+    setFullName(data.full_name || '')
+    setPhone(data.phone || '')
+    setAddress(data.address || '')
+    setBirthDate(data.birth_date ? data.birth_date.substring(0, 10) : '')
+  }
+
+  useEffect(() => { loadProfile() }, [])
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault()
@@ -22,10 +45,7 @@ export default function EmployeeProfile() {
     setLoading(true)
     const res = await fetch('/api/auth/change-password', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getToken()}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify({ current_password: currentPw, new_password: newPw }),
     })
     const data = await res.json()
@@ -34,10 +54,87 @@ export default function EmployeeProfile() {
     setLoading(false)
   }
 
+  async function saveProfile(e: React.FormEvent) {
+    e.preventDefault()
+    setProfileMsg(''); setProfileError('')
+    setProfileLoading(true)
+
+    const payload = {
+      full_name: fullName,
+      phone: phone || null,
+      address: address || null,
+      birth_date: birthDate && birthDate.length > 0 ? birthDate : null,
+    }
+
+    const res = await fetch('/api/profile', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify(payload),
+    })
+    const data = await res.json()
+
+    if (!res.ok) {
+      setProfileError(data.error)
+    } else {
+      setProfileMsg('Profil erfolgreich gespeichert ✅')
+      setUser(data)
+      setFullName(data.full_name || '')
+      setPhone(data.phone || '')
+      setAddress(data.address || '')
+      setBirthDate(data.birth_date ? data.birth_date.substring(0, 10) : '')
+    }
+    setProfileLoading(false)
+  }
+
   return (
     <div className="p-8 max-w-xl">
       <h1 className="page-title mb-6">👤 Mein Profil</h1>
-      <div className="card p-6">
+
+      {/* Profile Info */}
+      <div className="card p-6 mb-5">
+        <h2 className="section-title mb-4">Persönliche Daten</h2>
+        <div className="bg-brand-900 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <div className="w-12 h-12 bg-brand-700 rounded-full flex items-center justify-center text-white font-bold text-lg">
+            {user?.full_name?.charAt(0)}
+          </div>
+          <div>
+            <p className="font-semibold text-white">{user?.full_name}</p>
+            <p className="text-sm text-brand-300">{user?.email}</p>
+          </div>
+        </div>
+        <form onSubmit={saveProfile} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className="label">Vollständiger Name</label>
+              <input type="text" className="input" value={fullName} onChange={e => setFullName(e.target.value)} required />
+            </div>
+            <div className="col-span-2">
+              <label className="label">E-Mail</label>
+              <input type="text" className="input bg-gray-50" value={user?.email || ''} disabled />
+            </div>
+            <div>
+              <label className="label">Telefon</label>
+              <input type="text" className="input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+49 ..." />
+            </div>
+            <div>
+              <label className="label">Geburtsdatum</label>
+              <input type="date" className="input" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+            </div>
+            <div className="col-span-2">
+              <label className="label">Adresse</label>
+              <input type="text" className="input" value={address} onChange={e => setAddress(e.target.value)} placeholder="Musterstraße 1, 12345 Berlin" />
+            </div>
+          </div>
+          {profileError && <p className="text-red-600 text-sm bg-red-50 px-4 py-3 rounded-lg">{profileError}</p>}
+          {profileMsg && <p className="text-green-700 text-sm bg-green-50 px-4 py-3 rounded-lg">{profileMsg}</p>}
+          <button type="submit" disabled={profileLoading} className="btn-primary">
+            {profileLoading ? 'Wird gespeichert...' : 'Profil speichern'}
+          </button>
+        </form>
+      </div>
+
+      {/* Password */}
+      <div className="card p-6 mb-5">
         <h2 className="section-title mb-4">🔐 Passwort ändern</h2>
         <form onSubmit={changePassword} className="space-y-4">
           <div>
@@ -60,7 +157,8 @@ export default function EmployeeProfile() {
         </form>
       </div>
 
-      <div className="card p-6 mt-4">
+      {/* Hints */}
+      <div className="card p-6">
         <h2 className="section-title mb-3">💡 Hinweise zum Hochladen</h2>
         <ul className="text-sm text-gray-600 space-y-2">
           <li>✅ Akzeptiert: Klare Fotos (JPG, PNG) oder PDF-Dateien</li>
