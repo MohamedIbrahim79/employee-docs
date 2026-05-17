@@ -35,7 +35,6 @@ export default function EmployeeDetail() {
 
   useEffect(() => { load() }, [id])
 
-  // scroll للملف المحدد لما الصفحة تتحمل
   useEffect(() => {
     if (highlightDocId && !loading) {
       setTimeout(() => {
@@ -175,7 +174,9 @@ export default function EmployeeDetail() {
               <div
                 key={doc.id}
                 id={`doc-${doc.id}`}
-                className={highlightDocId === doc.id ? 'ring-2 ring-[#c9a84c] rounded-xl' : ''}
+                className={highlightDocId === doc.id
+                  ? 'ring-4 ring-[#c9a84c] rounded-xl shadow-lg shadow-yellow-100 bg-yellow-50'
+                  : ''}
               >
                 <DocumentCard doc={doc} isAdmin={true} onRefresh={load} />
               </div>
