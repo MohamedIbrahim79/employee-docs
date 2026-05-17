@@ -55,14 +55,14 @@ export default function AdminEmployees() {
   const empToDelete = employees.find(e => e.id === deleteId)
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="page-title">Mitarbeiter</h1>
           <p className="text-gray-500 text-sm mt-1">{employees.length} registrierte Mitarbeiter</p>
         </div>
-        <button onClick={() => setShowAdd(true)} className="btn-primary text-sm py-2 px-3">
-          Mitarbeiter hinzufügen
+        <button onClick={() => setShowAdd(true)} className="btn-primary text-xs py-1.5 px-3">
+          + Hinzufügen
         </button>
       </div>
 
@@ -70,7 +70,7 @@ export default function AdminEmployees() {
         <div className="p-4">
           <input
             className="input"
-            placeholder="Nach Name oder E-Mail suchen..."
+            placeholder="Nach Name suchen..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -98,10 +98,7 @@ export default function AdminEmployees() {
                       <div className="w-9 h-9 bg-brand-800 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
                         {emp.full_name?.charAt(0)}
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{emp.full_name}</p>
-                        <p className="text-xs text-gray-400">{emp.email}</p>
-                      </div>
+                      <p className="font-medium text-gray-900">{emp.full_name}</p>
                     </div>
                   </td>
                   <td className="table-cell">
