@@ -4,6 +4,18 @@ import { usePathname, useRouter } from 'next/navigation'
 import { UserPayload } from '@/lib/auth'
 import clsx from 'clsx'
 
+function PyramidLogo({ size = 9 }: { size?: number }) {
+  return (
+    <div className={`w-${size} h-${size} bg-brand-800 rounded-xl flex items-center justify-center overflow-hidden`}>
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-7 h-7">
+        <polygon points="20,4 36,32 4,32" fill="#c9a84c" opacity="0.9"/>
+        <polygon points="20,10 32,32 8,32" fill="#1a2744"/>
+        <polygon points="20,16 28,32 12,32" fill="#c9a84c" opacity="0.6"/>
+      </svg>
+    </div>
+  )
+}
+
 export default function EmployeeSidebar({ user }: { user: UserPayload }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -23,13 +35,13 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 bg-white border-r border-gray-100 flex-col shadow-sm shrink-0">
-        <div className="p-5 border-b border-gray-100">
+      <aside className="hidden md:flex w-64 bg-brand-900 flex-col shadow-xl shrink-0">
+        <div className="p-5 border-b border-brand-800">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-brand-800 rounded-xl flex items-center justify-center text-white text-lg">🏢</div>
+            <PyramidLogo />
             <div>
-              <p className="font-bold text-gray-900 text-sm leading-tight">Dokumentensystem</p>
-              <p className="text-xs text-gray-400">Mitarbeiterportal</p>
+              <p className="font-bold text-white text-sm leading-tight">Schmeuser GmbH</p>
+              <p className="text-xs text-brand-400">Mitarbeiterportal</p>
             </div>
           </div>
         </div>
@@ -46,35 +58,35 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
           })}
         </nav>
 
-        <div className="p-3 border-t border-gray-100">
+        <div className="p-3 border-t border-brand-800">
           <div className="flex items-center gap-3 px-3 py-2 mb-1">
-            <div className="w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center text-brand-800 font-bold text-sm">
+            <div className="w-8 h-8 bg-brand-700 rounded-full flex items-center justify-center text-white font-bold text-sm">
               {user.full_name?.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{user.full_name}</p>
-              <p className="text-xs text-gray-400">Mitarbeiter</p>
+              <p className="text-sm font-medium text-white truncate">{user.full_name}</p>
+              <p className="text-xs text-brand-400">Mitarbeiter</p>
             </div>
           </div>
-          <button onClick={logout} className="sidebar-link w-full text-red-500 hover:text-red-700 hover:bg-red-50">
+          <button onClick={logout} className="sidebar-link w-full text-red-400 hover:text-red-300 hover:bg-red-900/20">
             <span>🚪</span><span>Abmelden</span>
           </button>
         </div>
       </aside>
 
       {/* Mobile Top Bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-brand-900 shadow-lg">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-brand-800 rounded-lg flex items-center justify-center text-white">🏢</div>
-            <p className="font-bold text-gray-900 text-sm">Dokumentensystem</p>
+            <PyramidLogo size={8} />
+            <p className="font-bold text-white text-sm">Schmeuser GmbH</p>
           </div>
-          <button onClick={logout} className="text-red-500 text-sm px-2 py-1">🚪</button>
+          <button onClick={logout} className="text-red-400 text-sm px-2 py-1">🚪</button>
         </div>
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 shadow-lg">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-brand-900 border-t border-brand-800 shadow-lg">
         <div className="flex justify-around items-center py-2">
           {links.map(l => {
             const active = l.exact ? pathname === l.href : pathname.startsWith(l.href)
@@ -82,7 +94,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
               <Link key={l.href} href={l.href}
                 className={clsx(
                   'flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors',
-                  active ? 'text-brand-800' : 'text-gray-400'
+                  active ? 'text-[#c9a84c]' : 'text-brand-400'
                 )}>
                 <span className="text-xl">{l.icon}</span>
                 <span className="text-xs font-medium">{l.label}</span>
