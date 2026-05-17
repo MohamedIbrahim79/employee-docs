@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 
   const { data, error } = await supabaseAdmin
     .from('users')
-    .select('id, email, full_name, role, phone, position, department, start_date, is_active, created_at')
+    .select('id, email, full_name, role, phone, start_date, birth_date, address, is_active, created_at')
     .eq('role', 'employee')
     .order('created_at', { ascending: false })
 
@@ -25,15 +25,24 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
-    const { email, full_name, position, department, phone, start_date } = body
-    if (!email || !full_name) return NextResponse.json({ error: 'الاسم والبريد مطلوبان' }, { status: 400 })
+    const { email, full_name, phone, start_date, birth_date, address } = body
+    if (!email || !full_name) return NextResponse.json({ error: 'Name und E-Mail sind erforderlich' }, { status: 400 })
 
     const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-4).toUpperCase()
     const hash = await hashPassword(tempPassword)
 
     const { data: user2, error } = await supabaseAdmin
       .from('users')
-      .insert({ email: email.toLowerCase(), full_name, password_hash: hash, role: 'employee', phone, position, department, start_date: start_date || null })
+      .insert({
+        email: email.toLowerCase(),
+        full_name,
+        password_hash: hash,
+        role: 'employee',
+        phone,
+        start_date: start_date || null,
+        birth_date: birth_date || null,
+        address: address || null,
+      })
       .select()
       .single()
 
