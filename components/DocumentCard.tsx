@@ -31,11 +31,19 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
     else { statusLabel = 'سارية'; statusClass = 'badge-green'; borderColor = 'border-green-200' }
   }
 
+  function getToken() {
+    return localStorage.getItem('auth_token') ||
+      document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
+  }
+
   async function review(action: 'approve' | 'reject') {
     setLoading(true)
     await fetch(`/api/documents/${doc.id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}`
+      },
       body: JSON.stringify({ action, notes }),
     })
     setLoading(false)
@@ -45,7 +53,6 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
 
   return (
     <div className={`card p-5 border ${borderColor} transition-colors`}>
-      {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-gray-900 text-sm leading-tight">
@@ -56,11 +63,10 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
         <span className={`badge ${statusClass} shrink-0`}>{statusLabel}</span>
       </div>
 
-      {/* Details */}
       <div className="space-y-1.5 mb-4">
         {doc.document_type?.has_expiry && (
           <div className="flex justify-between text-xs">
-            <span className="text-gray-400">تاريخ الانتهاء</span>
+            <span className="text-gray-400">Ablaufdatum</span>
             <span className={`font-medium ${isExpired ? 'text-red-600' : isExpiring ? 'text-yellow-700' : 'text-gray-700'}`}>
               {doc.expiry_date ? new Date(doc.expiry_date).toLocaleDateString('de-DE') : '—'}
             </span>
@@ -68,15 +74,15 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
         )}
         {daysLeft !== null && hasFile && (
           <div className="flex justify-between text-xs">
-            <span className="text-gray-400">المتبقي</span>
+            <span className="text-gray-400">Verbleibend</span>
             <span className={`font-medium ${isExpired ? 'text-red-600' : isExpiring ? 'text-yellow-700' : 'text-green-700'}`}>
-              {isExpired ? `انتهت منذ ${Math.abs(daysLeft)} يوم` : `${daysLeft} يوم`}
+              {isExpired ? `Abgelaufen seit ${Math.abs(daysLeft)} Tagen` : `${daysLeft} Tage`}
             </span>
           </div>
         )}
         {doc.file_name && (
           <div className="flex justify-between text-xs">
-            <span className="text-gray-400">الملف</span>
+            <span className="text-gray-400">Datei</span>
             <span className="text-gray-600 truncate max-w-[150px]">{doc.file_name}</span>
           </div>
         )}
@@ -86,49 +92,47 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
           </div>
         )}
         {!doc.document_type?.is_required && (
-          <span className="text-xs text-gray-400">اختياري</span>
+          <span className="text-xs text-gray-400">Optional</span>
         )}
       </div>
 
-      {/* Actions */}
       <div className="flex gap-2 flex-wrap">
         {hasFile && (
           <a href={doc.file_url} target="_blank" rel="noopener noreferrer"
             className="btn-secondary py-1.5 px-3 text-xs">
-            👁 عرض
+            👁 Anzeigen
           </a>
         )}
         {!isAdmin && (
           <button onClick={onUpload} className={`py-1.5 px-3 text-xs ${hasFile ? 'btn-secondary' : 'btn-primary'}`}>
-            {hasFile ? '🔄 تحديث' : '⬆️ رفع الوثيقة'}
+            {hasFile ? '🔄 Aktualisieren' : '⬆️ Hochladen'}
           </button>
         )}
         {isAdmin && hasFile && !reviewing && (
           <button onClick={() => setReviewing(true)} className="btn-secondary py-1.5 px-3 text-xs">
-            📝 مراجعة
+            📝 Überprüfen
           </button>
         )}
       </div>
 
-      {/* Admin review panel */}
       {isAdmin && reviewing && (
         <div className="mt-3 pt-3 border-t border-gray-100 space-y-2">
           <textarea
             className="input text-xs"
             rows={2}
-            placeholder="ملاحظات (اختياري)..."
+            placeholder="Anmerkungen (optional)..."
             value={notes}
             onChange={e => setNotes(e.target.value)}
           />
           <div className="flex gap-2">
             <button onClick={() => review('approve')} disabled={loading} className="btn-primary py-1.5 px-3 text-xs flex-1 justify-center">
-              ✅ قبول
+              ✅ Genehmigen
             </button>
             <button onClick={() => review('reject')} disabled={loading} className="btn-danger py-1.5 px-3 text-xs flex-1 justify-center">
-              ❌ رفض
+              ❌ Ablehnen
             </button>
             <button onClick={() => setReviewing(false)} className="btn-secondary py-1.5 px-3 text-xs">
-              إلغاء
+              Abbrechen
             </button>
           </div>
         </div>
