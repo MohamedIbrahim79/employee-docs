@@ -16,6 +16,7 @@ export default function EmployeeDetail() {
   const [activeTab, setActiveTab] = useState<'info' | 'docs'>(
     searchParams.get('tab') === 'docs' ? 'docs' : 'info'
   )
+  const highlightDocId = searchParams.get('doc')
 
   function getToken() {
     return localStorage.getItem('auth_token') ||
@@ -33,6 +34,16 @@ export default function EmployeeDetail() {
   }
 
   useEffect(() => { load() }, [id])
+
+  // scroll للملف المحدد لما الصفحة تتحمل
+  useEffect(() => {
+    if (highlightDocId && !loading) {
+      setTimeout(() => {
+        const el = document.getElementById(`doc-${highlightDocId}`)
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 300)
+    }
+  }, [highlightDocId, loading])
 
   async function sendReminders() {
     setSending(true)
@@ -89,18 +100,18 @@ export default function EmployeeDetail() {
               </span>
             </div>
           </div>
-         <div className="flex gap-1.5 flex-wrap">
-  {msg && <span className="text-xs text-green-600 badge badge-green">{msg}</span>}
-  <button onClick={sendReminders} disabled={sending} className="btn-secondary text-xs py-1.5 px-2.5">
-    {sending ? '...' : 'Erinnerungen'}
-  </button>
-  <button onClick={toggleActive} className={`text-xs py-1.5 px-2.5 ${employee.is_active ? 'btn-secondary text-red-600' : 'btn-primary'}`}>
-    {employee.is_active ? 'Deaktivieren' : 'Aktivieren'}
-  </button>
-  <button onClick={() => setShowDeleteConfirm(true)} className="btn-danger text-xs py-1.5 px-2.5">
-    Löschen
-  </button>
-</div>
+          <div className="flex gap-1.5 flex-wrap">
+            {msg && <span className="text-xs text-green-600 badge badge-green">{msg}</span>}
+            <button onClick={sendReminders} disabled={sending} className="btn-secondary text-xs py-1.5 px-2.5">
+              {sending ? '...' : 'Erinnerungen'}
+            </button>
+            <button onClick={toggleActive} className={`text-xs py-1.5 px-2.5 ${employee.is_active ? 'btn-secondary text-red-600' : 'btn-primary'}`}>
+              {employee.is_active ? 'Deaktivieren' : 'Aktivieren'}
+            </button>
+            <button onClick={() => setShowDeleteConfirm(true)} className="btn-danger text-xs py-1.5 px-2.5">
+              Löschen
+            </button>
+          </div>
         </div>
       </div>
 
@@ -161,7 +172,13 @@ export default function EmployeeDetail() {
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {docs.map((doc: any) => (
-              <DocumentCard key={doc.id} doc={doc} isAdmin={true} onRefresh={load} />
+              <div
+                key={doc.id}
+                id={`doc-${doc.id}`}
+                className={highlightDocId === doc.id ? 'ring-2 ring-[#c9a84c] rounded-xl' : ''}
+              >
+                <DocumentCard doc={doc} isAdmin={true} onRefresh={load} />
+              </div>
             ))}
             {docs.length === 0 && <div className="col-span-2 text-center py-10 text-gray-400">Keine Dokumente</div>}
           </div>
