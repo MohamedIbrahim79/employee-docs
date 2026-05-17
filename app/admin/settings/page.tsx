@@ -202,17 +202,6 @@ export default function AdminSettings() {
           </button>
         </form>
       </div>
-
-      <div className="card p-6">
-        <h2 className="section-title mb-2">Benachrichtigungseinstellungen</h2>
-        <p className="text-sm text-gray-500 mb-4">Automatische Benachrichtigungen werden täglich per Cron-Skript gesendet</p>
-        <div className="bg-gray-50 rounded-lg p-4 text-sm font-mono text-gray-700 space-y-1">
-          <p># Manuell ausführen:</p>
-          <p className="text-brand-800">node lib/cron.js</p>
-          <p className="mt-2"># GitHub Actions (täglich um 8 Uhr):</p>
-          <p className="text-brand-800">cron: '0 8 * * *'</p>
-        </div>
-      </div>
     </div>
   )
 }
