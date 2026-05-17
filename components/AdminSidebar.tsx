@@ -51,7 +51,8 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
   const links = [
     { href: '/admin', label: 'Dashboard', icon: '📊', exact: true },
     { href: '/admin/employees', label: 'Mitarbeiter', icon: '👥' },
-    { href: '/admin/alerts', label: 'Benachrichtigungen', icon: '🔔' },
+    { href: '/admin/alerts', label: 'Ablaufende Dokumente', icon: '🔔' },
+    { href: '/admin/notifications', label: 'Benachrichtigungen', icon: '📩' },
     { href: '/admin/settings', label: 'Einstellungen', icon: '⚙️' },
   ]
 
@@ -83,7 +84,7 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
               <Link key={l.href} href={l.href} className={clsx('sidebar-link', active && 'active')}>
                 <span>{l.icon}</span>
                 <span className="flex-1">{l.label}</span>
-                {l.href === '/admin/alerts' && unread > 0 && (
+                {l.href === '/admin/notifications' && unread > 0 && (
                   <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                     {unread}
                   </span>
@@ -121,7 +122,7 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
             <PyramidLogo size={8} />
             <p className="font-bold text-white text-sm">Schmeuser GmbH</p>
           </div>
-          <Link href="/admin/alerts" className="relative text-white p-1">
+          <Link href="/admin/notifications" className="relative text-white p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
@@ -165,7 +166,7 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
                     className={clsx('sidebar-link', active && 'active')}>
                     <span>{l.icon}</span>
                     <span className="flex-1">{l.label}</span>
-                    {l.href === '/admin/alerts' && unread > 0 && (
+                    {l.href === '/admin/notifications' && unread > 0 && (
                       <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                         {unread}
                       </span>
