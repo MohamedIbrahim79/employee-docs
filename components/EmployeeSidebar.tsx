@@ -2,18 +2,15 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { UserPayload } from '@/lib/auth'
-import { useLang } from './LangProvider'
-import LangSwitcher from './LangSwitcher'
 import clsx from 'clsx'
 
 export default function EmployeeSidebar({ user }: { user: UserPayload }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { t } = useLang()
 
   const links = [
-    { href: '/employee', label: t('myDocuments'), icon: '📄', exact: true },
-    { href: '/employee/profile', label: t('myProfile'), icon: '👤' },
+    { href: '/employee', label: 'Meine Dokumente', icon: '📄', exact: true },
+    { href: '/employee/profile', label: 'Mein Profil', icon: '👤' },
   ]
 
   async function logout() {
@@ -28,14 +25,13 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 bg-white border-r border-gray-100 flex-col shadow-sm shrink-0">
         <div className="p-5 border-b border-gray-100">
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-brand-800 rounded-xl flex items-center justify-center text-white text-lg">🏢</div>
             <div>
               <p className="font-bold text-gray-900 text-sm leading-tight">Dokumentensystem</p>
-              <p className="text-xs text-gray-400">{t('employeePortal')}</p>
+              <p className="text-xs text-gray-400">Mitarbeiterportal</p>
             </div>
           </div>
-          <LangSwitcher />
         </div>
 
         <nav className="flex-1 p-3 space-y-0.5">
@@ -61,7 +57,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
             </div>
           </div>
           <button onClick={logout} className="sidebar-link w-full text-red-500 hover:text-red-700 hover:bg-red-50">
-            <span>🚪</span><span>{t('logout')}</span>
+            <span>🚪</span><span>Abmelden</span>
           </button>
         </div>
       </aside>
@@ -73,10 +69,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
             <div className="w-8 h-8 bg-brand-800 rounded-lg flex items-center justify-center text-white">🏢</div>
             <p className="font-bold text-gray-900 text-sm">Dokumentensystem</p>
           </div>
-          <div className="flex items-center gap-2">
-            <LangSwitcher />
-            <button onClick={logout} className="text-red-500 text-sm px-2 py-1">🚪</button>
-          </div>
+          <button onClick={logout} className="text-red-500 text-sm px-2 py-1">🚪</button>
         </div>
       </div>
 
