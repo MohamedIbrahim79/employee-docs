@@ -14,7 +14,8 @@ export default function EmployeeDetail() {
   const [deleting, setDeleting] = useState(false)
 
   function getToken() {
-    return localStorage.getItem('auth_token') || ''
+    return localStorage.getItem('auth_token') || 
+      document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
   }
 
   async function load() {

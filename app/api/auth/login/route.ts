@@ -21,7 +21,17 @@ export async function POST(req: Request) {
 
     const token = signToken({ id: user.id, email: user.email, role: user.role, full_name: user.full_name })
 
-    return NextResponse.json({ token, role: user.role, name: user.full_name })
+    const response = NextResponse.json({ token, role: user.role, name: user.full_name })
+    
+    response.cookies.set('auth_token', token, {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+    })
+
+    return response
   } catch (e) {
     return NextResponse.json({ error: 'خطأ في الخادم' }, { status: 500 })
   }
