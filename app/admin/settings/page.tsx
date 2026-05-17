@@ -27,14 +27,9 @@ export default function AdminSettings() {
       headers: { 'Authorization': `Bearer ${getToken()}` }
     })
       .then(r => r.json())
-      .then(async me => {
-        setUser(me)
-        setFullName(me.full_name || '')
-        // جيب بيانات إضافية من الـ API
-        const res = await fetch(`/api/employees/${me.id}`, {
-          headers: { 'Authorization': `Bearer ${getToken()}` }
-        })
-        const data = await res.json()
+      .then(data => {
+        setUser(data)
+        setFullName(data.full_name || '')
         setPhone(data.phone || '')
         setAddress(data.address || '')
         setBirthDate(data.birth_date ? data.birth_date.split('T')[0] : '')
@@ -62,7 +57,7 @@ export default function AdminSettings() {
     e.preventDefault()
     setProfileMsg(''); setProfileError('')
     setProfileLoading(true)
-    const res = await fetch(`/api/employees/${user?.id}`, {
+    const res = await fetch(`/api/profile`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify({
@@ -70,7 +65,6 @@ export default function AdminSettings() {
         phone,
         address,
         birth_date: birthDate || null,
-        is_active: true
       }),
     })
     const data = await res.json()
@@ -103,6 +97,10 @@ export default function AdminSettings() {
             <div className="col-span-2">
               <label className="label">Vollständiger Name</label>
               <input type="text" className="input" value={fullName} onChange={e => setFullName(e.target.value)} required />
+            </div>
+            <div className="col-span-2">
+              <label className="label">E-Mail</label>
+              <input type="text" className="input bg-gray-50" value={user?.email || ''} disabled />
             </div>
             <div>
               <label className="label">Telefon</label>
