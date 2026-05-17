@@ -174,9 +174,11 @@ export default function EmployeeDetail() {
               <div
                 key={doc.id}
                 id={`doc-${doc.id}`}
-                className={highlightDocId === doc.id
-                  ? 'outline outline-4 outline-offset-2 outline-[#c9a84c] rounded-xl'
-                  : ''}
+                style={highlightDocId === doc.id ? {
+                  borderRadius: '12px',
+                  boxShadow: '0 0 0 3px #c9a84c, 0 0 20px rgba(201, 168, 76, 0.4)',
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                } : {}}
               >
                 <DocumentCard doc={doc} isAdmin={true} onRefresh={load} />
               </div>
