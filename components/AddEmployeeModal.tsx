@@ -1,6 +1,5 @@
 'use client'
 import { useState } from 'react'
-import { useLang } from './LangProvider'
 
 interface Props {
   onClose: () => void
@@ -16,18 +15,26 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState<any>(null)
-  const { t } = useLang()
 
   function set(k: string, v: string) { setForm(f => ({ ...f, [k]: v })) }
+
+  function getToken() {
+    return localStorage.getItem('auth_token') ||
+      document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true); setError('')
     const full_name = `${form.first_name} ${form.last_name}`.trim()
     const address = `${form.street} ${form.house_number}, ${form.postal_code} ${form.city}`.trim()
+    const token = getToken()
     const res = await fetch('/api/employees', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify({
         full_name,
         email: form.email,
@@ -70,7 +77,6 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
         ) : (
           <form onSubmit={submit} className="p-6 space-y-4" dir="ltr">
 
-            {/* الاسم */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="label">Vorname <span className="text-red-500">*</span></label>
@@ -82,11 +88,10 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
               </div>
             </div>
 
-            {/* الإيميل والهاتف */}
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="label">E-Mail <span className="text-red-500">*</span></label>
-                <input className="input" type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="max@company.de" required />
+                <input className="input" type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="max@schmeuser.de" required />
               </div>
               <div>
                 <label className="label">Telefon</label>
@@ -98,7 +103,6 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
               </div>
             </div>
 
-            {/* العنوان */}
             <div>
               <p className="text-sm font-semibold text-gray-700 mb-2">📍 Adresse</p>
               <div className="grid grid-cols-3 gap-3">
@@ -121,7 +125,6 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
               </div>
             </div>
 
-            {/* تاريخ البداية */}
             <div>
               <label className="label">Eintrittsdatum</label>
               <input className="input" type="date" value={form.start_date} onChange={e => set('start_date', e.target.value)} />
