@@ -77,12 +77,8 @@ export default function AdminSettings() {
       setProfileError(data.error)
     } else {
       setProfileMsg('Profil erfolgreich gespeichert ✅')
-      setUser(data)
-      setFullName(data.full_name || '')
-      setPhone(data.phone || '')
-      setAddress(data.address || '')
-      setBirthDate(data.birth_date ? data.birth_date.substring(0, 10) : '')
-    }
+      setUser((prev: any) => ({ ...prev, full_name: fullName, phone, address, birth_date: birthDate }))
+   }
     setProfileLoading(false)
   }
 
