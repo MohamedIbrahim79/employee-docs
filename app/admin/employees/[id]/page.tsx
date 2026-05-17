@@ -175,10 +175,15 @@ export default function EmployeeDetail() {
                 key={doc.id}
                 id={`doc-${doc.id}`}
                 style={highlightDocId === doc.id ? {
+                  transform: 'scale(1.03)',
+                  boxShadow: '0 10px 40px rgba(0, 0, 0, 0.18)',
                   borderRadius: '12px',
-                  boxShadow: '0 0 0 3px #c9a84c, 0 0 20px rgba(201, 168, 76, 0.4)',
-                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                } : {}}
+                  position: 'relative',
+                  zIndex: 10,
+                  transition: 'all 0.3s ease',
+                } : {
+                  transition: 'all 0.3s ease',
+                }}
               >
                 <DocumentCard doc={doc} isAdmin={true} onRefresh={load} />
               </div>
