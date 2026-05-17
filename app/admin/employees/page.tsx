@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import AddEmployeeModal from '@/components/AddEmployeeModal'
-import { useLang } from '@/components/LangProvider'
 
 export default function AdminEmployees() {
   const [employees, setEmployees] = useState<any[]>([])
@@ -12,21 +11,24 @@ export default function AdminEmployees() {
   const [error, setError] = useState('')
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
-  const { t } = useLang()
+
+  function getToken() {
+    return localStorage.getItem('auth_token') ||
+      document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
+  }
 
   async function load() {
     setLoading(true)
     setError('')
     try {
-      const token = localStorage.getItem('auth_token')
       const res = await fetch('/api/employees', {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${getToken()}` }
       })
       const data = await res.json()
       if (res.ok) setEmployees(Array.isArray(data) ? data : [])
-      else setError(data.error || t('serverError'))
+      else setError(data.error || 'Serverfehler')
     } catch {
-      setError(t('connectionError'))
+      setError('Verbindungsfehler')
     }
     setLoading(false)
   }
@@ -36,7 +38,10 @@ export default function AdminEmployees() {
   async function deleteEmployee() {
     if (!deleteId) return
     setDeleting(true)
-    await fetch(`/api/employees/${deleteId}`, { method: 'DELETE' })
+    await fetch(`/api/employees/${deleteId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
     setDeleteId(null)
     setDeleting(false)
     load()
@@ -44,8 +49,7 @@ export default function AdminEmployees() {
 
   const filtered = employees.filter(e =>
     e.full_name?.toLowerCase().includes(search.toLowerCase()) ||
-    e.email?.toLowerCase().includes(search.toLowerCase()) ||
-    e.position?.toLowerCase().includes(search.toLowerCase())
+    e.email?.toLowerCase().includes(search.toLowerCase())
   )
 
   const empToDelete = employees.find(e => e.id === deleteId)
@@ -54,11 +58,11 @@ export default function AdminEmployees() {
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="page-title">{t('employees')}</h1>
-          <p className="text-gray-500 text-sm mt-1">{employees.length} {t('registeredEmployees')}</p>
+          <h1 className="page-title">Mitarbeiter</h1>
+          <p className="text-gray-500 text-sm mt-1">{employees.length} registrierte Mitarbeiter</p>
         </div>
         <button onClick={() => setShowAdd(true)} className="btn-primary">
-          ➕ {t('addEmployee')}
+          ➕ Mitarbeiter hinzufügen
         </button>
       </div>
 
@@ -66,7 +70,7 @@ export default function AdminEmployees() {
         <div className="p-4">
           <input
             className="input"
-            placeholder={`🔍 ${t('searchEmployee')}`}
+            placeholder="🔍 Nach Name oder E-Mail suchen..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -76,16 +80,14 @@ export default function AdminEmployees() {
       {error && <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">⚠️ {error}</div>}
 
       {loading ? (
-        <div className="text-center py-20 text-gray-400">{t('loading')}</div>
+        <div className="text-center py-20 text-gray-400">Wird geladen...</div>
       ) : (
         <div className="card overflow-hidden">
           <table className="w-full">
             <thead className="table-head">
               <tr>
-                <th className="px-4 py-3 text-right font-semibold">{t('employee')}</th>
-                <th className="px-4 py-3 text-right font-semibold">{t('position')}</th>
-                <th className="px-4 py-3 text-right font-semibold">{t('status')}</th>
-                <th className="px-4 py-3 text-right font-semibold">{t('actions')}</th>
+                <th className="px-4 py-3 text-left font-semibold">Mitarbeiter</th>
+                <th className="px-4 py-3 text-left font-semibold">Aktionen</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -93,7 +95,7 @@ export default function AdminEmployees() {
                 <tr key={emp.id} className="hover:bg-gray-50 transition-colors">
                   <td className="table-cell">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-brand-100 rounded-full flex items-center justify-center text-brand-800 font-bold text-sm shrink-0">
+                      <div className="w-9 h-9 bg-brand-800 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
                         {emp.full_name?.charAt(0)}
                       </div>
                       <div>
@@ -103,18 +105,9 @@ export default function AdminEmployees() {
                     </div>
                   </td>
                   <td className="table-cell">
-                    <p className="text-gray-700">{emp.position || '—'}</p>
-                    <p className="text-xs text-gray-400">{emp.department || ''}</p>
-                  </td>
-                  <td className="table-cell">
-                    <span className={`badge ${emp.is_active ? 'badge-green' : 'badge-gray'}`}>
-                      {emp.is_active ? t('active') : t('inactive')}
-                    </span>
-                  </td>
-                  <td className="table-cell">
                     <div className="flex gap-2">
                       <Link href={`/admin/employees/${emp.id}`} className="btn-secondary py-1.5 px-3 text-xs">
-                        {t('viewDocuments')}
+                        📁 Öffnen
                       </Link>
                       <button onClick={() => setDeleteId(emp.id)} className="btn-danger py-1.5 px-3 text-xs">
                         🗑
@@ -124,7 +117,7 @@ export default function AdminEmployees() {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={4} className="text-center py-10 text-gray-400">{t('noResults')}</td></tr>
+                <tr><td colSpan={2} className="text-center py-10 text-gray-400">Keine Ergebnisse</td></tr>
               )}
             </tbody>
           </table>
