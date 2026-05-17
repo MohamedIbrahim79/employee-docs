@@ -73,7 +73,6 @@ export default function EmployeeDetail() {
         ← Zurück
       </button>
 
-      {/* Header */}
       <div className="card p-6 mb-6">
         <div className="flex items-start gap-6 flex-wrap">
           <div className="w-16 h-16 bg-brand-800 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shrink-0">
@@ -103,7 +102,6 @@ export default function EmployeeDetail() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => setActiveTab('info')}
@@ -117,7 +115,6 @@ export default function EmployeeDetail() {
         </button>
       </div>
 
-      {/* Personal Info Tab */}
       {activeTab === 'info' && (
         <div className="card p-6">
           <h2 className="section-title mb-6">👤 Persönliche Informationen</h2>
@@ -148,14 +145,6 @@ export default function EmployeeDetail() {
                 <p className="text-gray-900">{employee.address || '—'}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Position</p>
-                <p className="text-gray-900">{employee.position || '—'}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Abteilung</p>
-                <p className="text-gray-900">{employee.department || '—'}</p>
-              </div>
-              <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Eintrittsdatum</p>
                 <p className="text-gray-900">
                   {employee.start_date ? new Date(employee.start_date).toLocaleDateString('de-DE') : '—'}
@@ -166,7 +155,6 @@ export default function EmployeeDetail() {
         </div>
       )}
 
-      {/* Documents Tab */}
       {activeTab === 'docs' && (
         <div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -178,7 +166,6 @@ export default function EmployeeDetail() {
         </div>
       )}
 
-      {/* Delete Confirmation */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
