@@ -20,7 +20,7 @@ export async function PUT(req: Request) {
 
   if (!userData) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-  await supabaseAdmin
+  const { error } = await supabaseAdmin
     .from('users')
     .update({ 
       full_name, 
@@ -30,12 +30,14 @@ export async function PUT(req: Request) {
     })
     .eq('id', userData.id)
 
-  // جيب البيانات الجديدة بعد التحديث
-  const { data } = await supabaseAdmin
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // جيب البيانات الجديدة مباشرة من قاعدة البيانات
+  const { data: freshData } = await supabaseAdmin
     .from('users')
     .select('id, email, full_name, role, phone, address, birth_date, is_active')
-    .eq('id', userData.id)
+    .eq('email', session.email)
     .single()
 
-  return NextResponse.json(data)
+  return NextResponse.json(freshData)
 }
