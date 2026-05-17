@@ -25,11 +25,11 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
   let borderColor = 'border-gray-100'
 
   if (hasFile) {
-    if (doc.status === 'rejected') { statusLabel = 'Abgelehnt ❌'; statusClass = 'badge-red'; borderColor = 'border-red-200' }
-    else if (doc.status === 'pending') { statusLabel = 'In Bearbeitung ⏳'; statusClass = 'badge-blue'; borderColor = 'border-blue-200' }
-    else if (isExpired) { statusLabel = 'Abgelaufen 🚨'; statusClass = 'badge-red'; borderColor = 'border-red-200' }
-    else if (isExpiring) { statusLabel = 'Läuft bald ab ⏰'; statusClass = 'badge-yellow'; borderColor = 'border-yellow-200' }
-    else { statusLabel = 'Gültig ✅'; statusClass = 'badge-green'; borderColor = 'border-green-200' }
+    if (doc.status === 'rejected') { statusLabel = 'Abgelehnt'; statusClass = 'badge-red'; borderColor = 'border-red-200' }
+    else if (doc.status === 'pending') { statusLabel = 'In Bearbeitung'; statusClass = 'badge-blue'; borderColor = 'border-blue-200' }
+    else if (isExpired) { statusLabel = 'Abgelaufen'; statusClass = 'badge-red'; borderColor = 'border-red-200' }
+    else if (isExpiring) { statusLabel = 'Läuft bald ab'; statusClass = 'badge-yellow'; borderColor = 'border-yellow-200' }
+    else { statusLabel = 'Gültig'; statusClass = 'badge-green'; borderColor = 'border-green-200' }
   }
 
   function getToken() {
@@ -88,7 +88,7 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
         )}
         {doc.notes && (
           <div className="bg-red-50 text-red-700 text-xs px-3 py-2 rounded-lg mt-2">
-            💬 {doc.notes}
+            {doc.notes}
           </div>
         )}
         {!doc.document_type?.is_required && (
@@ -100,17 +100,17 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
         {hasFile && (
           <a href={doc.file_url} target="_blank" rel="noopener noreferrer"
             className="btn-secondary py-1.5 px-3 text-xs">
-            👁 Anzeigen
+            Anzeigen
           </a>
         )}
         {!isAdmin && (
           <button onClick={onUpload} className={`py-1.5 px-3 text-xs ${hasFile ? 'btn-secondary' : 'btn-primary'}`}>
-            {hasFile ? '🔄 Aktualisieren' : '⬆️ Hochladen'}
+            {hasFile ? 'Aktualisieren' : 'Hochladen'}
           </button>
         )}
         {isAdmin && hasFile && !reviewing && (
           <button onClick={() => setReviewing(true)} className="btn-secondary py-1.5 px-3 text-xs">
-            📝 Überprüfen
+            Überprüfen
           </button>
         )}
       </div>
@@ -126,10 +126,10 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
           />
           <div className="flex gap-2">
             <button onClick={() => review('approve')} disabled={loading} className="btn-primary py-1.5 px-3 text-xs flex-1 justify-center">
-              ✅ Genehmigen
+              Genehmigen
             </button>
             <button onClick={() => review('reject')} disabled={loading} className="btn-danger py-1.5 px-3 text-xs flex-1 justify-center">
-              ❌ Ablehnen
+              Ablehnen
             </button>
             <button onClick={() => setReviewing(false)} className="btn-secondary py-1.5 px-3 text-xs">
               Abbrechen

@@ -44,23 +44,22 @@ export default function EmployeeDocs() {
   const missing = docs.filter(d => !d.file_url).length
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="page-title">📄 Meine Dokumente</h1>
+    <div className="p-4 md:p-8">
+      <div className="mb-6">
+        <h1 className="page-title">Meine Dokumente</h1>
         <p className="text-gray-500 text-sm mt-1">Laden Sie Ihre erforderlichen Dokumente hoch</p>
       </div>
 
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'Hochgeladen', value: uploaded, color: 'text-green-700', icon: '✅' },
-          { label: 'Fehlend', value: missing, color: 'text-gray-600', icon: '📋' },
-          { label: 'Läuft bald ab', value: expiring, color: 'text-yellow-700', icon: '⏰' },
-          { label: 'Abgelaufen', value: expired, color: 'text-red-700', icon: '🚨' },
+          { label: 'Hochgeladen', value: uploaded, color: 'text-green-700' },
+          { label: 'Fehlend', value: missing, color: 'text-gray-600' },
+          { label: 'Läuft bald ab', value: expiring, color: 'text-yellow-700' },
+          { label: 'Abgelaufen', value: expired, color: 'text-red-700' },
         ].map(s => (
           <div key={s.label} className="stat-card">
-            <div className="text-xl mb-1">{s.icon}</div>
+            <div className="text-sm font-semibold text-gray-500 mb-1">{s.label}</div>
             <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
-            <div className="text-xs text-gray-500 mt-0.5">{s.label}</div>
           </div>
         ))}
       </div>
@@ -68,7 +67,7 @@ export default function EmployeeDocs() {
       {loading ? (
         <div className="text-center py-20 text-gray-400">Wird geladen...</div>
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {docs.map(doc => (
             <DocumentCard
               key={doc.id}
