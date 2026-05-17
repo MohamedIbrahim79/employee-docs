@@ -69,7 +69,7 @@ export default async function AlertsPage() {
 function AlertRow({ alert }: { alert: any }) {
   const isExpired = alert.daysLeft < 0
   return (
-    <div className="flex items-center gap-3 px-4 py-3 flex-wrap">
+    <div className="flex items-center gap-3 px-4 py-3">
       <div className={`w-2 h-2 rounded-full shrink-0 ${isExpired ? 'bg-red-500' : 'bg-yellow-400'}`} />
       <div className="w-8 h-8 bg-brand-800 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
         {(alert.user as any)?.full_name?.charAt(0)}
@@ -79,13 +79,13 @@ function AlertRow({ alert }: { alert: any }) {
         <p className="text-xs text-gray-500">{(alert.document_type as any)?.name_de}</p>
         <p className="text-xs text-gray-400">Ablaufdatum: {new Date(alert.expiry_date).toLocaleDateString('de-DE')}</p>
       </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <span className={`badge ${isExpired ? 'badge-red' : 'badge-yellow'} text-xs`}>
-          {isExpired ? `Abgelaufen seit ${Math.abs(alert.daysLeft)} Tagen` : `Noch ${alert.daysLeft} Tage`}
-        </span>
-        <Link href={`/admin/employees/${(alert.user as any)?.id}?tab=docs`} className="btn-secondary py-1.5 px-3 text-xs shrink-0">
+      <div className="flex flex-col items-end gap-1 shrink-0">
+        <Link href={`/admin/employees/${(alert.user as any)?.id}?tab=docs`} className="btn-secondary py-1.5 px-3 text-xs">
           Anzeigen
         </Link>
+        <span className={`text-xs font-medium ${isExpired ? 'text-red-600' : 'text-yellow-700'}`}>
+          {isExpired ? `Seit ${Math.abs(alert.daysLeft)} Tagen` : `Noch ${alert.daysLeft} Tage`}
+        </span>
       </div>
     </div>
   )

@@ -14,23 +14,20 @@ export default function SendAllButton() {
     setLoading(true); setMsg('')
     const res = await fetch('/api/notifications', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getToken()}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: '{}'
     })
     const data = await res.json()
-    setMsg(`${data.sent} Erinnerungen gesendet ✓`)
+    setMsg(`${data.sent} gesendet`)
     setLoading(false)
   }
 
   return (
-    <div className="flex items-center gap-3">
-      {msg && <span className="text-sm text-green-700 bg-green-50 px-3 py-1.5 rounded-lg">{msg}</span>}
-      <button onClick={sendAll} disabled={loading} className="btn-primary text-xs py-1.5 px-3">
-        {loading ? '...' : '📨 Alle Erinnerungen senden'}
+    <div className="flex flex-col items-end gap-1">
+      <button onClick={sendAll} disabled={loading} className="btn-primary text-xs py-1.5 px-3 whitespace-nowrap">
+        {loading ? '...' : 'Erinnerungen senden'}
       </button>
+      {msg && <span className="text-xs text-green-700">{msg}</span>}
     </div>
   )
 }
