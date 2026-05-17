@@ -67,15 +67,15 @@ export default function EmployeeDetail() {
     router.push('/admin/employees')
   }
 
-  if (loading) return <div className="p-8 text-center text-gray-400">جارٍ التحميل...</div>
-  if (!employee) return <div className="p-8 text-center text-gray-400">الموظف غير موجود</div>
+  if (loading) return <div className="p-8 text-center text-gray-400">Wird geladen...</div>
+  if (!employee) return <div className="p-8 text-center text-gray-400">Mitarbeiter nicht gefunden</div>
 
   const docs = employee.documents || []
 
   return (
     <div className="p-8">
       <button onClick={() => router.back()} className="text-sm text-gray-500 hover:text-gray-900 mb-6 flex items-center gap-2">
-        ← رجوع
+        ← Zurück
       </button>
 
       <div className="card p-6 mb-6 flex items-center gap-6">
@@ -108,7 +108,7 @@ export default function EmployeeDetail() {
 
       <div>
         <h2 className="section-title mb-4">📄 Dokumente ({docs.length})</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {docs.map((doc: any) => (
             <DocumentCard key={doc.id} doc={doc} isAdmin={true} onRefresh={load} />
           ))}

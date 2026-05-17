@@ -9,10 +9,7 @@ interface Props {
   onDone: () => void
 }
 
-// الوثائق اللي بتحتاج تاريخ إصدار بس (والنظام يحسب الانتهاء تلقائياً)
 const ISSUE_DATE_ONLY_DOCS = ['Führungszeugnis']
-
-// الوثائق اللي مش محتاجة أي تواريخ
 const NO_DATES_DOCS = ['Steuer-ID', 'Sozialversicherungsnummer']
 
 export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
@@ -37,15 +34,14 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
     accept: { 'image/*': ['.jpg', '.jpeg', '.png', '.webp'], 'application/pdf': ['.pdf'] },
     maxSize: 10 * 1024 * 1024,
     multiple: false,
-    onDropRejected: () => setError('الملف غير مقبول. يجب أن يكون صورة أو PDF ولا يتجاوز 10MB'),
+    onDropRejected: () => setError('Datei nicht akzeptiert. Nur Bilder oder PDF bis 10MB erlaubt.'),
   })
 
   async function handleUpload() {
-    if (!file && !doc.file_url) { setError('يجب رفع ملف'); return }
-    if (showExpiryDate && !expiryDate) { setError('يجب إدخال تاريخ الانتهاء'); return }
-    if (isIssueDateOnly && !issueDate) { setError('يجب إدخال تاريخ الإصدار'); return }
+    if (!file && !doc.file_url) { setError('Bitte laden Sie eine Datei hoch'); return }
+    if (showExpiryDate && !expiryDate) { setError('Bitte Ablaufdatum eingeben'); return }
+    if (isIssueDateOnly && !issueDate) { setError('Bitte Ausstellungsdatum eingeben'); return }
 
-    // حساب تاريخ انتهاء شهادة حسن السيرة تلقائياً (6 شهور من الإصدار)
     let finalExpiryDate = expiryDate
     if (isIssueDateOnly && issueDate) {
       const issue = new Date(issueDate)
@@ -66,14 +62,20 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
       if (issueDate) fd.append('issue_date', issueDate)
 
       setProgress(60)
-      const res = await fetch('/api/documents', { method: 'POST', body: fd })
+      const token = localStorage.getItem('auth_token') ||
+        document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
+      const res = await fetch('/api/documents', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: fd
+      })
       const data = await res.json()
       setProgress(100)
 
-      if (!res.ok) { setError(data.error || 'فشل الرفع'); setUploading(false); return }
+      if (!res.ok) { setError(data.error || 'Upload fehlgeschlagen'); setUploading(false); return }
       onDone()
     } catch {
-      setError('خطأ في الاتصال')
+      setError('Verbindungsfehler')
       setUploading(false)
     }
   }
@@ -86,15 +88,14 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-bold text-gray-900">{doc.document_type?.name_ar}</h2>
-              <p className="text-sm text-gray-400">{doc.document_type?.name_de}</p>
+              <h2 className="font-bold text-gray-900">{doc.document_type?.name_de}</h2>
+              <p className="text-sm text-gray-400">{doc.document_type?.name_ar}</p>
             </div>
             <button onClick={onClose} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
           </div>
         </div>
 
         <div className="p-6 space-y-5">
-          {/* Dropzone */}
           <div>
             <label className="label">Datei (Foto oder PDF)</label>
             <div
@@ -121,32 +122,30 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
             </div>
           </div>
 
-          {/* تاريخ الانتهاء فقط للوثائق العادية */}
           {showExpiryDate && (
-  <div>
-    <label className="label">
-      Ablaufdatum <span className="text-red-500">*</span>
-    </label>
-    {docNameDe === 'Bankkarte / IBAN' ? (
-      <input
-        type="month"
-        className="input"
-        value={expiryDate ? expiryDate.substring(0, 7) : ''}
-        onChange={e => setExpiryDate(e.target.value + '-01')}
-      />
-    ) : (
-      <input
-        type="date"
-        className="input"
-        value={expiryDate}
-        onChange={e => setExpiryDate(e.target.value)}
-        min={new Date().toISOString().split('T')[0]}
-      />
-    )}
-  </div>
-)}
+            <div>
+              <label className="label">
+                Ablaufdatum <span className="text-red-500">*</span>
+              </label>
+              {docNameDe === 'Bankkarte / IBAN' ? (
+                <input
+                  type="month"
+                  className="input"
+                  value={expiryDate ? expiryDate.substring(0, 7) : ''}
+                  onChange={e => setExpiryDate(e.target.value + '-01')}
+                />
+              ) : (
+                <input
+                  type="date"
+                  className="input"
+                  value={expiryDate}
+                  onChange={e => setExpiryDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              )}
+            </div>
+          )}
 
-          {/* تاريخ الإصدار فقط لشهادة حسن السيرة */}
           {isIssueDateOnly && (
             <div>
               <label className="label">
