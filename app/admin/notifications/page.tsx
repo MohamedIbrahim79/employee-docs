@@ -18,11 +18,14 @@ export default function AdminNotifications() {
     const data = await res.json()
     setNotifications(Array.isArray(data) ? data : [])
     setLoading(false)
+  }
 
-    await fetch('/api/in-app-notifications', {
+  async function markAsRead(id: string) {
+    await fetch(`/api/in-app-notifications/${id}`, {
       method: 'PATCH',
       headers: { 'Authorization': `Bearer ${getToken()}` }
     })
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n))
   }
 
   useEffect(() => { load() }, [])
@@ -52,7 +55,8 @@ export default function AdminNotifications() {
                 </div>
                 {n.metadata?.employee_id && (
                   <Link
-                    href={`/admin/employees/${n.metadata.employee_id}?tab=docs&doc=${n.metadata.document_id}`}
+                    href={`/admin/employees/${n.metadata.employee_id}?tab=docs`}
+                    onClick={() => markAsRead(n.id)}
                     className="btn-secondary py-1.5 px-3 text-xs shrink-0">
                     Öffnen
                   </Link>
