@@ -61,8 +61,8 @@ export default function AdminEmployees() {
           <h1 className="page-title">Mitarbeiter</h1>
           <p className="text-gray-500 text-sm mt-1">{employees.length} registrierte Mitarbeiter</p>
         </div>
-        <button onClick={() => setShowAdd(true)} className="btn-primary">
-          ➕ Mitarbeiter hinzufügen
+        <button onClick={() => setShowAdd(true)} className="btn-primary text-sm py-2 px-3">
+          Mitarbeiter hinzufügen
         </button>
       </div>
 
@@ -70,14 +70,14 @@ export default function AdminEmployees() {
         <div className="p-4">
           <input
             className="input"
-            placeholder="🔍 Nach Name oder E-Mail suchen..."
+            placeholder="Nach Name oder E-Mail suchen..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </div>
       </div>
 
-      {error && <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">⚠️ {error}</div>}
+      {error && <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">{error}</div>}
 
       {loading ? (
         <div className="text-center py-20 text-gray-400">Wird geladen...</div>
@@ -107,10 +107,10 @@ export default function AdminEmployees() {
                   <td className="table-cell">
                     <div className="flex gap-2">
                       <Link href={`/admin/employees/${emp.id}`} className="btn-secondary py-1.5 px-3 text-xs">
-                        📁 Öffnen
+                        Öffnen
                       </Link>
                       <button onClick={() => setDeleteId(emp.id)} className="btn-danger py-1.5 px-3 text-xs">
-                        🗑
+                        Löschen
                       </button>
                     </div>
                   </td>
@@ -129,7 +129,6 @@ export default function AdminEmployees() {
       {deleteId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 text-center">
-            <div className="text-5xl mb-3">⚠️</div>
             <h2 className="text-xl font-bold text-gray-900 mb-2">Mitarbeiter löschen?</h2>
             <p className="text-gray-500 text-sm mb-6">
               Möchten Sie <strong>{empToDelete?.full_name}</strong> wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
@@ -137,7 +136,7 @@ export default function AdminEmployees() {
             <div className="flex gap-3">
               <button onClick={() => setDeleteId(null)} className="btn-secondary flex-1 justify-center">Abbrechen</button>
               <button onClick={deleteEmployee} disabled={deleting} className="btn-danger flex-1 justify-center">
-                {deleting ? '...' : '🗑 Löschen'}
+                {deleting ? '...' : 'Löschen'}
               </button>
             </div>
           </div>
