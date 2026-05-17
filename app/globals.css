@@ -11,9 +11,7 @@
     --brand-light: #f0f0ff;
   }
 
-  body {
-    direction: rtl;
-  }
+  
 }
 
 @layer components {
