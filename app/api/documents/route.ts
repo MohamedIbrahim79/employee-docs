@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     if (existing) {
       const { data } = await supabaseAdmin
         .from('documents')
-        .update({ file_url: fileUrl, file_name: fileName, file_size: fileSize, expiry_date: expiryDate || null, issue_date: issueDate || null, status: 'active', notes: null, reviewed_by: null, reviewed_at: null, uploaded_at: new Date().toISOString() })
+        .update({ file_url: fileUrl, file_name: fileName, file_size: fileSize, expiry_date: expiryDate || null, issue_date: issueDate || null, status: 'pending', notes: null, reviewed_by: null, reviewed_at: null, uploaded_at: new Date().toISOString() })
         .eq('id', existing.id)
         .select()
         .single()
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
     } else {
       const { data } = await supabaseAdmin
         .from('documents')
-        .insert({ user_id: userId, document_type_id: documentTypeId, file_url: fileUrl, file_name: fileName, file_size: fileSize, expiry_date: expiryDate || null, issue_date: issueDate || null, status: 'active' })
+        .insert({ user_id: userId, document_type_id: documentTypeId, file_url: fileUrl, file_name: fileName, file_size: fileSize, expiry_date: expiryDate || null, issue_date: issueDate || null, status: 'pending' })
         .select()
         .single()
       doc = data

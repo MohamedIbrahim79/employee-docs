@@ -20,15 +20,16 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
   const isExpired = daysLeft !== null && daysLeft < 0
   const isExpiring = daysLeft !== null && daysLeft >= 0 && daysLeft <= 30
 
-  let statusLabel = 'مفقودة'
+  let statusLabel = 'Fehlend'
   let statusClass = 'badge-gray'
   let borderColor = 'border-gray-100'
 
   if (hasFile) {
-    if (doc.status === 'rejected') { statusLabel = 'مرفوضة'; statusClass = 'badge-red'; borderColor = 'border-red-200' }
-    else if (isExpired) { statusLabel = 'منتهية'; statusClass = 'badge-red'; borderColor = 'border-red-200' }
-    else if (isExpiring) { statusLabel = 'تنتهي قريباً'; statusClass = 'badge-yellow'; borderColor = 'border-yellow-200' }
-    else { statusLabel = 'سارية'; statusClass = 'badge-green'; borderColor = 'border-green-200' }
+    if (doc.status === 'rejected') { statusLabel = 'Abgelehnt ❌'; statusClass = 'badge-red'; borderColor = 'border-red-200' }
+    else if (doc.status === 'pending') { statusLabel = 'In Bearbeitung ⏳'; statusClass = 'badge-blue'; borderColor = 'border-blue-200' }
+    else if (isExpired) { statusLabel = 'Abgelaufen 🚨'; statusClass = 'badge-red'; borderColor = 'border-red-200' }
+    else if (isExpiring) { statusLabel = 'Läuft bald ab ⏰'; statusClass = 'badge-yellow'; borderColor = 'border-yellow-200' }
+    else { statusLabel = 'Gültig ✅'; statusClass = 'badge-green'; borderColor = 'border-green-200' }
   }
 
   function getToken() {
@@ -56,9 +57,9 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex-1 min-w-0">
           <p className="font-semibold text-gray-900 text-sm leading-tight">
-            {doc.document_type?.name_ar}
+            {doc.document_type?.name_de}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">{doc.document_type?.name_de}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{doc.document_type?.name_ar}</p>
         </div>
         <span className={`badge ${statusClass} shrink-0`}>{statusLabel}</span>
       </div>
@@ -72,7 +73,7 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
             </span>
           </div>
         )}
-        {daysLeft !== null && hasFile && (
+        {daysLeft !== null && hasFile && doc.status === 'active' && (
           <div className="flex justify-between text-xs">
             <span className="text-gray-400">Verbleibend</span>
             <span className={`font-medium ${isExpired ? 'text-red-600' : isExpiring ? 'text-yellow-700' : 'text-green-700'}`}>
