@@ -12,9 +12,10 @@ export default function EmployeeDetail() {
   const [msg, setMsg] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [activeTab, setActiveTab] = useState<'info' | 'docs'>('info')
 
   function getToken() {
-    return localStorage.getItem('auth_token') || 
+    return localStorage.getItem('auth_token') ||
       document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
   }
 
@@ -35,10 +36,7 @@ export default function EmployeeDetail() {
     setMsg('')
     const res = await fetch('/api/notifications', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getToken()}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify({ user_id: id })
     })
     const data = await res.json()
@@ -49,10 +47,7 @@ export default function EmployeeDetail() {
   async function toggleActive() {
     await fetch(`/api/employees/${id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getToken()}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify({ ...employee, is_active: !employee.is_active })
     })
     load()
@@ -73,49 +68,117 @@ export default function EmployeeDetail() {
   const docs = employee.documents || []
 
   return (
-    <div className="p-8">
+    <div className="p-6">
       <button onClick={() => router.back()} className="text-sm text-gray-500 hover:text-gray-900 mb-6 flex items-center gap-2">
         ← Zurück
       </button>
 
-      <div className="card p-6 mb-6 flex items-center gap-6">
-        <div className="w-16 h-16 bg-brand-100 rounded-2xl flex items-center justify-center text-brand-800 font-bold text-2xl shrink-0">
-          {employee.full_name?.charAt(0)}
-        </div>
-        <div className="flex-1">
-          <h1 className="text-xl font-bold text-gray-900">{employee.full_name}</h1>
-          <div className="flex flex-wrap gap-3 mt-1.5 text-sm text-gray-500">
-            <span>📧 {employee.email}</span>
-            {employee.phone && <span>📞 {employee.phone}</span>}
-            {employee.position && <span>💼 {employee.position}</span>}
-            {employee.department && <span>🏛 {employee.department}</span>}
-            {employee.start_date && <span>📅 {new Date(employee.start_date).toLocaleDateString('de-DE')}</span>}
+      {/* Header */}
+      <div className="card p-6 mb-6">
+        <div className="flex items-start gap-6 flex-wrap">
+          <div className="w-16 h-16 bg-brand-800 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shrink-0">
+            {employee.full_name?.charAt(0)}
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-xl font-bold text-gray-900">{employee.full_name}</h1>
+              <span className={`badge ${employee.is_active ? 'badge-green' : 'badge-gray'}`}>
+                {employee.is_active ? '✅ Aktiv' : '⏸ Inaktiv'}
+              </span>
+            </div>
+            <p className="text-gray-500 text-sm mt-1">📧 {employee.email}</p>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {msg && <span className="text-sm text-green-600 badge badge-green">{msg}</span>}
+            <button onClick={sendReminders} disabled={sending} className="btn-secondary text-sm">
+              {sending ? '...' : '📨 Erinnerungen'}
+            </button>
+            <button onClick={toggleActive} className={employee.is_active ? 'btn-secondary text-red-600 text-sm' : 'btn-primary text-sm'}>
+              {employee.is_active ? '⏸ Deaktivieren' : '▶️ Aktivieren'}
+            </button>
+            <button onClick={() => setShowDeleteConfirm(true)} className="btn-danger text-sm">
+              🗑 Löschen
+            </button>
           </div>
         </div>
-        <div className="flex gap-3 items-center flex-wrap justify-end">
-          {msg && <span className="text-sm text-green-600 badge badge-green">{msg}</span>}
-          <button onClick={sendReminders} disabled={sending} className="btn-secondary">
-            {sending ? '...' : '📨 Erinnerungen senden'}
-          </button>
-          <button onClick={toggleActive} className={employee.is_active ? 'btn-secondary text-red-600' : 'btn-primary'}>
-            {employee.is_active ? '⏸ Deaktivieren' : '▶️ Aktivieren'}
-          </button>
-          <button onClick={() => setShowDeleteConfirm(true)} className="btn-danger">
-            🗑 Löschen
-          </button>
-        </div>
       </div>
 
-      <div>
-        <h2 className="section-title mb-4">📄 Dokumente ({docs.length})</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {docs.map((doc: any) => (
-            <DocumentCard key={doc.id} doc={doc} isAdmin={true} onRefresh={load} />
-          ))}
-          {docs.length === 0 && <div className="col-span-2 text-center py-10 text-gray-400">Keine Dokumente</div>}
-        </div>
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6">
+        <button
+          onClick={() => setActiveTab('info')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'info' ? 'bg-brand-800 text-white' : 'bg-white text-gray-600 border border-gray-200'}`}>
+          👤 Persönliche Daten
+        </button>
+        <button
+          onClick={() => setActiveTab('docs')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'docs' ? 'bg-brand-800 text-white' : 'bg-white text-gray-600 border border-gray-200'}`}>
+          📄 Dokumente ({docs.length})
+        </button>
       </div>
 
+      {/* Personal Info Tab */}
+      {activeTab === 'info' && (
+        <div className="card p-6">
+          <h2 className="section-title mb-6">👤 Persönliche Informationen</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Vollständiger Name</p>
+                <p className="text-gray-900 font-medium">{employee.full_name || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">E-Mail</p>
+                <p className="text-gray-900">{employee.email || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Telefon</p>
+                <p className="text-gray-900">{employee.phone || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Geburtsdatum</p>
+                <p className="text-gray-900">
+                  {employee.birth_date ? new Date(employee.birth_date).toLocaleDateString('de-DE') : '—'}
+                </p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Adresse</p>
+                <p className="text-gray-900">{employee.address || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Position</p>
+                <p className="text-gray-900">{employee.position || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Abteilung</p>
+                <p className="text-gray-900">{employee.department || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Eintrittsdatum</p>
+                <p className="text-gray-900">
+                  {employee.start_date ? new Date(employee.start_date).toLocaleDateString('de-DE') : '—'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Documents Tab */}
+      {activeTab === 'docs' && (
+        <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {docs.map((doc: any) => (
+              <DocumentCard key={doc.id} doc={doc} isAdmin={true} onRefresh={load} />
+            ))}
+            {docs.length === 0 && <div className="col-span-2 text-center py-10 text-gray-400">Keine Dokumente</div>}
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
@@ -127,9 +190,7 @@ export default function EmployeeDetail() {
               </p>
             </div>
             <div className="flex gap-3">
-              <button onClick={() => setShowDeleteConfirm(false)} className="btn-secondary flex-1 justify-center">
-                Abbrechen
-              </button>
+              <button onClick={() => setShowDeleteConfirm(false)} className="btn-secondary flex-1 justify-center">Abbrechen</button>
               <button onClick={deleteEmployee} disabled={deleting} className="btn-danger flex-1 justify-center">
                 {deleting ? '...' : '🗑 Endgültig löschen'}
               </button>

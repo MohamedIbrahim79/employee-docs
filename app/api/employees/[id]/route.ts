@@ -11,7 +11,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
   const { data: userData, error: userError } = await supabaseAdmin
     .from('users')
-    .select('id, email, full_name, role, phone, position, department, start_date, is_active, created_at')
+    .select('id, email, full_name, role, phone, position, department, start_date, birth_date, address, is_active, created_at')
     .eq('id', params.id)
     .single()
 
@@ -34,10 +34,11 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   if (!session || session.role !== 'admin') return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
 
   const body = await req.json()
-  const { full_name, position, department, phone, start_date, is_active } = body
+  const { full_name, position, department, phone, start_date, birth_date, address, is_active } = body
+
   const { data, error } = await supabaseAdmin
     .from('users')
-    .update({ full_name, position, department, phone, start_date, is_active })
+    .update({ full_name, position, department, phone, start_date, birth_date, address, is_active })
     .eq('id', params.id)
     .select()
     .single()
