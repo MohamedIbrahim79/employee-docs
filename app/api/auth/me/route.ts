@@ -16,5 +16,5 @@ export async function GET(req: Request) {
     .eq('id', user.id)
     .single()
 
-  return NextResponse.json(data || user)
+  return NextResponse.json(data)
 }
