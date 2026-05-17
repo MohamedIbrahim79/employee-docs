@@ -7,7 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-32-characters'
 export type UserPayload = {
   id: string
   email: string
-  role: 'admin' | 'employee'
+  role: 'admin' | 'employee' | 'owner' | 'hr'
   full_name: string
 }
 
