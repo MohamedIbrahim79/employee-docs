@@ -10,11 +10,22 @@ export async function GET(req: Request) {
   const user = verifyToken(token)
   if (!user) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
-  const { data } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin
     .from('users')
-    .select('id, email, full_name, role, phone, address, birth_date, is_active')
+    .select('*')
     .eq('id', user.id)
     .single()
 
-  return NextResponse.json(data)
+  if (error || !data) return NextResponse.json(user)
+
+  return NextResponse.json({
+    id: data.id,
+    email: data.email,
+    full_name: data.full_name,
+    role: data.role,
+    phone: data.phone,
+    address: data.address,
+    birth_date: data.birth_date,
+    is_active: data.is_active,
+  })
 }
