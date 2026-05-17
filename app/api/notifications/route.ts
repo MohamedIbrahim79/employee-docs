@@ -7,7 +7,8 @@ import { differenceInDays } from 'date-fns'
 export async function POST(req: Request) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session || session.role !== 'admin') return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  if (!session || !['admin', 'owner', 'hr'].includes(session.role)) 
+    return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   const { user_id } = await req.json().catch(() => ({}))
 
@@ -51,5 +52,5 @@ export async function POST(req: Request) {
     } catch {}
   }
 
-  return NextResponse.json({ sent, message: `تم إرسال ${sent} إشعار` })
+  return NextResponse.json({ sent, message: `${sent} Erinnerungen gesendet` })
 }
