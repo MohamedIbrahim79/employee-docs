@@ -52,7 +52,7 @@ export default function AdminNotifications() {
                 </div>
                 {n.metadata?.employee_id && (
                   <Link
-                    href={`/admin/employees/${n.metadata.employee_id}?tab=docs`}
+                    href={`/admin/employees/${n.metadata.employee_id}?tab=docs&doc=${n.metadata.document_id}`}
                     className="btn-secondary py-1.5 px-3 text-xs shrink-0">
                     Öffnen
                   </Link>
