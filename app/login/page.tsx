@@ -23,7 +23,7 @@ export default function LoginPage() {
       if (!res.ok) { setError('E-Mail oder Passwort ist falsch'); return }
       localStorage.setItem('auth_token', data.token)
       localStorage.setItem('user_role', data.role)
-      router.push(data.role === 'admin' ? '/admin' : '/employee')
+      router.push(data.role === 'employee' ? '/employee' : '/admin')
       router.refresh()
     } catch {
       setError('Verbindungsfehler. Bitte versuchen Sie es erneut.')
@@ -35,7 +35,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-brand-900 flex items-center justify-center p-4 relative overflow-hidden">
       
-      {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-800 rounded-full opacity-30" />
         <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-brand-800 rounded-full opacity-30" />
@@ -44,7 +43,6 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md relative z-10">
         
-        {/* Logo & Company Name */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl mb-5 border border-white/20">
             <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12">
@@ -58,7 +56,6 @@ export default function LoginPage() {
           <p className="text-white/50 text-xs mt-3">Mitarbeiter-Dokumentenverwaltung</p>
         </div>
 
-        {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8 border border-white/10">
           <h2 className="text-xl font-bold text-brand-900 mb-6 text-center">Anmelden</h2>
           
