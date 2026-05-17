@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: Request) {
   const token = getTokenFromRequest(req)
   if (!token) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
