@@ -59,7 +59,6 @@ export default function DocumentCard({ doc, isAdmin, onRefresh, onUpload }: Prop
           <p className="font-semibold text-gray-900 text-sm leading-tight">
             {doc.document_type?.name_de}
           </p>
-          <p className="text-xs text-gray-400 mt-0.5">{doc.document_type?.name_ar}</p>
         </div>
         <span className={`badge ${statusClass} shrink-0`}>{statusLabel}</span>
       </div>
