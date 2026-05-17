@@ -28,7 +28,7 @@ export default function SendAllButton() {
   return (
     <div className="flex items-center gap-3">
       {msg && <span className="text-sm text-green-700 bg-green-50 px-3 py-1.5 rounded-lg">{msg}</span>}
-      <button onClick={sendAll} disabled={loading} className="btn-primary">
+      <button onClick={sendAll} disabled={loading} className="btn-primary text-xs py-1.5 px-3">
         {loading ? '...' : '📨 Alle Erinnerungen senden'}
       </button>
     </div>
