@@ -9,6 +9,7 @@ export async function PUT(req: Request) {
 
   const { full_name, phone, address, birth_date } = await req.json()
 
+  console.log('SESSION:', session)
   const { data, error } = await supabaseAdmin
     .from('users')
     .update({ full_name, phone, address, birth_date: birth_date || null })
