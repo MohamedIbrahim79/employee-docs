@@ -2,6 +2,8 @@ import { supabaseAdmin } from '@/lib/supabase'
 import { differenceInDays } from 'date-fns'
 import Link from 'next/link'
 
+export const revalidate = 0
+
 async function getDashboardData() {
   const [{ data: employees }, { data: documents }] = await Promise.all([
     supabaseAdmin.from('users').select('id, full_name, is_active').eq('role', 'employee'),
@@ -61,7 +63,6 @@ export default async function AdminDashboard() {
         </div>
         {alerts.length === 0 ? (
           <div className="p-10 text-center text-gray-400">
-            <div className="text-4xl mb-3">✅</div>
             <p>Keine ablaufenden Dokumente</p>
           </div>
         ) : (
@@ -75,10 +76,14 @@ export default async function AdminDashboard() {
                     <p className="text-sm font-medium text-gray-900">{(alert.user as any)?.full_name}</p>
                     <p className="text-xs text-gray-500">{(alert.document_type as any)?.name_de} — Läuft ab: {new Date(alert.expiry_date).toLocaleDateString('de-DE')}</p>
                   </div>
-                  <span className={`badge ${isExpired ? 'badge-red' : 'badge-yellow'}`}>
-                    {isExpired ? `Abgelaufen seit ${Math.abs(alert.daysLeft)} Tagen` : `Noch ${alert.daysLeft} Tage`}
-                  </span>
-                  <Link href={`/admin/employees/${(alert.user as any)?.id}?tab=docs`} className="text-xs text-brand-700 hover:underline">Anzeigen</Link>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <Link href={`/admin/employees/${(alert.user as any)?.id}?tab=docs`} className="text-xs text-brand-700 hover:underline">
+                      Anzeigen
+                    </Link>
+                    <span className={`text-xs font-medium ${isExpired ? 'text-red-600' : 'text-yellow-700'}`}>
+                      {isExpired ? `Seit ${Math.abs(alert.daysLeft)} Tagen` : `Noch ${alert.daysLeft} Tage`}
+                    </span>
+                  </div>
                 </div>
               )
             })}
