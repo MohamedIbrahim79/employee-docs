@@ -6,7 +6,7 @@ import { sendWelcomeEmail } from '@/lib/email'
 export async function GET(req: Request) {
   const token = getTokenFromRequest(req)
   const user = token ? verifyToken(token) : null
-  if (!user || user.role !== 'admin') return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  if (!user || !['admin', 'owner', 'hr'].includes(user.role)) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   const { data, error } = await supabaseAdmin
     .from('users')
@@ -21,7 +21,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session || session.role !== 'admin') return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  if (!session || !['admin', 'owner'].includes(session.role)) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   try {
     const body = await req.json()
