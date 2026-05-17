@@ -93,7 +93,7 @@ export default function AdminSettings() {
             {user?.full_name?.charAt(0)}
           </div>
           <div>
-            <p className="font-semibold text-white">{full_name}</p>
+            <p className="font-semibold text-white">{user?.full_name}</p>
             <p className="text-sm text-brand-300">{user?.email}</p>
             <span className="text-xs bg-[#c9a84c] text-white px-2 py-0.5 rounded-full mt-1 inline-block">
               {user?.role === 'owner' ? 'Geschäftsführer' : user?.role === 'hr' ? 'HR Manager' : 'Administrator'}
