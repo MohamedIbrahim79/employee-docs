@@ -89,18 +89,18 @@ export default function EmployeeDetail() {
               </span>
             </div>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            {msg && <span className="text-sm text-green-600 badge badge-green">{msg}</span>}
-            <button onClick={sendReminders} disabled={sending} className="btn-secondary text-sm">
-              {sending ? '...' : 'Erinnerungen'}
-            </button>
-            <button onClick={toggleActive} className={employee.is_active ? 'btn-secondary text-red-600 text-sm' : 'btn-primary text-sm'}>
-              {employee.is_active ? 'Deaktivieren' : 'Aktivieren'}
-            </button>
-            <button onClick={() => setShowDeleteConfirm(true)} className="btn-danger text-sm">
-              Löschen
-            </button>
-          </div>
+         <div className="flex gap-1.5 flex-wrap">
+  {msg && <span className="text-xs text-green-600 badge badge-green">{msg}</span>}
+  <button onClick={sendReminders} disabled={sending} className="btn-secondary text-xs py-1.5 px-2.5">
+    {sending ? '...' : 'Erinnerungen'}
+  </button>
+  <button onClick={toggleActive} className={`text-xs py-1.5 px-2.5 ${employee.is_active ? 'btn-secondary text-red-600' : 'btn-primary'}`}>
+    {employee.is_active ? 'Deaktivieren' : 'Aktivieren'}
+  </button>
+  <button onClick={() => setShowDeleteConfirm(true)} className="btn-danger text-xs py-1.5 px-2.5">
+    Löschen
+  </button>
+</div>
         </div>
       </div>
 
