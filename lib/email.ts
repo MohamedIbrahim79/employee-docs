@@ -49,8 +49,8 @@ export async function sendExpiryWarning(
 ) {
   const isExpired = daysLeft < 0
   const subject = isExpired
-    ? `🚨 Dokument abgelaufen: ${docNameDe}`
-    : `⚠️ Dokument läuft bald ab: ${docNameDe}`
+    ? `Dokument abgelaufen: ${docNameDe}`
+    : `Dokument läuft bald ab: ${docNameDe}`
   const body = `
     <p>Sehr geehrte/r <strong>${employeeName}</strong>,</p>
     <p>${isExpired ? 'Ihr folgendes Dokument ist <strong>abgelaufen</strong>:' : 'Ihr folgendes Dokument läuft bald ab:'}</p>
@@ -66,7 +66,7 @@ export async function sendDocumentUploaded(adminEmail: string, employeeName: str
   const body = `
     <p><strong>${employeeName}</strong> hat ein neues Dokument hochgeladen und wartet auf Ihre Überprüfung.</p>
     <a href="${SITE_URL}/admin" class="cta">Zur Verwaltung</a>`
-  await send(adminEmail, `📄 Neues Dokument: ${employeeName}`, emailTemplate('Neues Dokument hochgeladen', body))
+  await send(adminEmail, `Neues Dokument: ${employeeName}`, emailTemplate('Neues Dokument hochgeladen', body))
 }
 
 export async function sendDocumentStatus(
@@ -74,12 +74,12 @@ export async function sendDocumentStatus(
 ) {
   const docName = docNameAr
   const subject = approved
-    ? `✅ Dokument genehmigt: ${docName}`
-    : `❌ Dokument abgelehnt: ${docName}`
+    ? `Dokument genehmigt: ${docName}`
+    : `Dokument abgelehnt: ${docName}`
   const body = `
     <p>Sehr geehrte/r <strong>${employeeName}</strong>, bezüglich Ihres Dokuments <strong>${docName}</strong>:</p>
     <div class="box">
-      <span class="badge ${approved ? 'green' : 'red'}">${approved ? '✅ Genehmigt' : '❌ Abgelehnt'}</span>
+      <span class="badge ${approved ? 'green' : 'red'}">${approved ? 'Genehmigt' : 'Abgelehnt'}</span>
       ${notes ? `<br><br><div class="lbl">Anmerkungen</div><div>${notes}</div>` : ''}
     </div>`
   await send(email, subject, emailTemplate(subject, body))
@@ -93,6 +93,6 @@ export async function sendWelcomeEmail(email: string, employeeName: string, pass
       <br><div class="lbl">Temporäres Passwort</div>
       <div style="font-family:monospace;font-size:20px;font-weight:bold;color:#1a2744;letter-spacing:3px;margin-top:4px">${password}</div>
     </div>
-    <p style="color:#991b1b;font-size:13px">⚠️ Bitte ändern Sie Ihr Passwort nach der ersten Anmeldung.</p>`
+    <p style="color:#991b1b;font-size:13px">Bitte ändern Sie Ihr Passwort nach der ersten Anmeldung.</p>`
   await send(email, `Willkommen ${employeeName} - Ihre Zugangsdaten`, emailTemplate('Willkommen!', body))
 }
