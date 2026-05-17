@@ -24,7 +24,8 @@ export default function AdminSettings() {
 
   async function loadProfile() {
     const res = await fetch('/api/auth/me', {
-      headers: { 'Authorization': `Bearer ${getToken()}` }
+      headers: { 'Authorization': `Bearer ${getToken()}` },
+      cache: 'no-store'
     })
     const data = await res.json()
     setUser(data)
@@ -65,15 +66,12 @@ export default function AdminSettings() {
       birth_date: birthDate && birthDate.length > 0 ? birthDate : null,
     }
 
-    console.log('Saving profile:', payload)
-
     const res = await fetch('/api/profile', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify(payload),
     })
     const data = await res.json()
-    console.log('Profile response:', data)
 
     if (!res.ok) {
       setProfileError(data.error)
@@ -122,10 +120,7 @@ export default function AdminSettings() {
                 type="date"
                 className="input"
                 value={birthDate}
-                onChange={e => {
-                  console.log('birth_date changed:', e.target.value)
-                  setBirthDate(e.target.value)
-                }}
+                onChange={e => setBirthDate(e.target.value)}
               />
             </div>
             <div className="col-span-2">
