@@ -21,7 +21,9 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
   const pathname = usePathname()
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [showNotifications, setShowNotifications] = useState(false)
   const [unread, setUnread] = useState(0)
+  const [notifications, setNotifications] = useState<any[]>([])
 
   function getToken() {
     return localStorage.getItem('auth_token') ||
@@ -33,7 +35,17 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
       headers: { 'Authorization': `Bearer ${getToken()}` }
     })
     const data = await res.json()
+    setNotifications(Array.isArray(data) ? data : [])
     setUnread((data || []).filter((n: any) => !n.is_read).length)
+  }
+
+  async function markAsRead(id: string) {
+    await fetch(`/api/in-app-notifications/${id}`, {
+      method: 'PATCH',
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n))
+    setUnread(prev => Math.max(0, prev - 1))
   }
 
   useEffect(() => {
@@ -114,7 +126,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
             <PyramidLogo size={8} />
             <p className="font-bold text-white text-sm">Schmeuser GmbH</p>
           </div>
-          <Link href="/employee/notifications" className="relative text-white p-1">
+          <button onClick={() => setShowNotifications(!showNotifications)} className="relative text-white p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
@@ -123,8 +135,44 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
                 {unread}
               </span>
             )}
-          </Link>
+          </button>
         </div>
+
+        {/* Notifications Dropdown */}
+        {showNotifications && (
+          <div className="absolute top-full left-0 right-0 bg-white shadow-xl z-50 max-h-96 overflow-y-auto">
+            <div className="p-3 border-b border-gray-100 flex items-center justify-between">
+              <p className="font-semibold text-gray-900 text-sm">Benachrichtigungen</p>
+              <button onClick={() => setShowNotifications(false)} className="text-gray-400 text-lg">✕</button>
+            </div>
+            {notifications.length === 0 ? (
+              <div className="p-6 text-center text-gray-400 text-sm">Keine Benachrichtigungen</div>
+            ) : (
+              notifications.map(n => (
+                <div key={n.id} className={`p-3 border-b border-gray-50 ${!n.is_read ? 'bg-blue-50' : ''}`}>
+                  <div className="flex items-start gap-2">
+                    <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${!n.is_read ? 'bg-blue-500' : 'bg-gray-300'}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 text-xs">{n.title}</p>
+                      <p className="text-gray-600 text-xs mt-0.5">{n.message}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        {new Date(n.created_at).toLocaleDateString('de-DE')}
+                      </p>
+                    </div>
+                    {n.metadata?.document_id && (
+                      <Link
+                        href={`/employee?doc=${n.metadata.document_id}`}
+                        onClick={() => { markAsRead(n.id); setShowNotifications(false) }}
+                        className="btn-secondary py-1 px-2 text-xs shrink-0">
+                        Öffnen
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       {/* Mobile Overlay */}
