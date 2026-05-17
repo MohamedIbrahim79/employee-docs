@@ -28,14 +28,10 @@ export default async function AlertsPage() {
 
   return (
     <div className="p-4 md:p-8">
-      <div className="flex items-start justify-between mb-6 gap-4">
-        <div>
-          <h1 className="page-title">Benachrichtigungen</h1>
-          <p className="text-gray-500 text-sm mt-1">{alerts.length} Dokumente benötigen Aufmerksamkeit</p>
-        </div>
-        <div className="shrink-0">
-          <SendAllButton />
-        </div>
+      <div className="mb-6">
+        <h1 className="page-title">Benachrichtigungen</h1>
+        <p className="text-gray-500 text-sm mt-1 mb-4">{alerts.length} Dokumente benötigen  Aufmerksamkeit</p>
+        <SendAllButton />
       </div>
 
       {expired.length > 0 && (
