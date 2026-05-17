@@ -1,8 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useLang } from '@/components/LangProvider'
-import LangSwitcher from '@/components/LangSwitcher'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -10,7 +8,6 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const { t } = useLang()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -23,48 +20,57 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(t('loginError')); return }
-      
-      // حفظ الـ token في localStorage
+      if (!res.ok) { setError('E-Mail oder Passwort ist falsch'); return }
       localStorage.setItem('auth_token', data.token)
       localStorage.setItem('user_role', data.role)
-      
       router.push(data.role === 'admin' ? '/admin' : '/employee')
       router.refresh()
     } catch {
-      setError(t('connectionError'))
+      setError('Verbindungsfehler. Bitte versuchen Sie es erneut.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-900 via-brand-800 to-brand-600 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="flex justify-end mb-4">
-          <LangSwitcher />
-        </div>
+    <div className="min-h-screen bg-brand-900 flex items-center justify-center p-4 relative overflow-hidden">
+      
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-800 rounded-full opacity-30" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-brand-800 rounded-full opacity-30" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-800 rounded-full opacity-10" />
+      </div>
 
+      <div className="w-full max-w-md relative z-10">
+        
+        {/* Logo & Company Name */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur rounded-2xl mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur-sm rounded-2xl mb-5 border border-white/20">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12">
+              <polygon points="20,2 38,34 2,34" fill="#c9a84c" opacity="0.9"/>
+              <polygon points="20,9 32,34 8,34" fill="#1a2744"/>
+              <polygon points="20,16 28,34 12,34" fill="#c9a84c" opacity="0.6"/>
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white">{t('loginTitle')}</h1>
-          <p className="text-white/70 text-sm mt-1">{t('loginSubtitle')}</p>
+          <h1 className="text-3xl font-bold text-white tracking-wide">Schmeuser GmbH</h1>
+          <p className="text-[#c9a84c] text-sm mt-1 font-medium tracking-widest uppercase">Security Services</p>
+          <p className="text-white/50 text-xs mt-3">Mitarbeiter-Dokumentenverwaltung</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        {/* Login Card */}
+        <div className="bg-white rounded-2xl shadow-2xl p-8 border border-white/10">
+          <h2 className="text-xl font-bold text-brand-900 mb-6 text-center">Anmelden</h2>
+          
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="label">{t('email')}</label>
+              <label className="label">E-Mail-Adresse</label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="input"
-                placeholder="name@company.de"
+                placeholder="name@schmeuser.de"
                 required
               />
             </div>
@@ -87,13 +93,13 @@ export default function LoginPage() {
             )}
 
             <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3 text-base">
-              {loading ? t('loggingIn') : t('loginButton')}
+              {loading ? 'Anmeldung läuft...' : 'Anmelden'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-white/50 text-xs mt-6">
-          {t('documentSystem')} — {t('allRightsReserved')}
+        <p className="text-center text-white/30 text-xs mt-6">
+          © 2025 Schmeuser GmbH — Alle Rechte vorbehalten
         </p>
       </div>
     </div>
