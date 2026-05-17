@@ -16,6 +16,12 @@ function PyramidLogo({ size = 9 }: { size?: number }) {
   )
 }
 
+function getRoleLabel(role: string) {
+  if (role === 'owner') return 'Geschäftsführer'
+  if (role === 'hr') return 'HR Manager'
+  return 'Administrator'
+}
+
 export default function AdminSidebar({ user }: { user: UserPayload }) {
   const pathname = usePathname()
   const router = useRouter()
@@ -61,15 +67,15 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
         </nav>
 
         <div className="p-3 border-t border-brand-800">
-          <div className="flex items-center gap-3 px-3 py-2 mb-1">
+          <Link href="/admin/settings" className="flex items-center gap-3 px-3 py-2 mb-1 rounded-lg hover:bg-brand-800 transition-colors">
             <div className="w-8 h-8 bg-brand-700 rounded-full flex items-center justify-center text-white font-bold text-sm">
               {user.full_name?.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{user.full_name}</p>
-              <p className="text-xs text-brand-400">Administrator</p>
+              <p className="text-xs text-brand-400">{getRoleLabel(user.role)}</p>
             </div>
-          </div>
+          </Link>
           <button onClick={logout} className="sidebar-link w-full text-red-400 hover:text-red-300 hover:bg-red-900/20">
             <span>🚪</span><span>Abmelden</span>
           </button>

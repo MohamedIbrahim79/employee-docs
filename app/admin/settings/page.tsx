@@ -14,6 +14,8 @@ export default function AdminSettings() {
   const [profileLoading, setProfileLoading] = useState(false)
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
+  const [address, setAddress] = useState('')
+  const [birthDate, setBirthDate] = useState('')
 
   function getToken() {
     return localStorage.getItem('auth_token') ||
@@ -25,10 +27,17 @@ export default function AdminSettings() {
       headers: { 'Authorization': `Bearer ${getToken()}` }
     })
       .then(r => r.json())
-      .then(data => {
-        setUser(data)
-        setFullName(data.full_name || '')
+      .then(async me => {
+        setUser(me)
+        setFullName(me.full_name || '')
+        // جيب بيانات إضافية من الـ API
+        const res = await fetch(`/api/employees/${me.id}`, {
+          headers: { 'Authorization': `Bearer ${getToken()}` }
+        })
+        const data = await res.json()
         setPhone(data.phone || '')
+        setAddress(data.address || '')
+        setBirthDate(data.birth_date ? data.birth_date.split('T')[0] : '')
       })
   }, [])
 
@@ -56,7 +65,13 @@ export default function AdminSettings() {
     const res = await fetch(`/api/employees/${user?.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-      body: JSON.stringify({ full_name: fullName, phone, is_active: true }),
+      body: JSON.stringify({
+        full_name: fullName,
+        phone,
+        address,
+        birth_date: birthDate || null,
+        is_active: true
+      }),
     })
     const data = await res.json()
     if (!res.ok) setProfileError(data.error)
@@ -71,26 +86,36 @@ export default function AdminSettings() {
       {/* Profile */}
       <div className="card p-6 mb-5">
         <h2 className="section-title mb-4">👤 Mein Profil</h2>
-        <div className="bg-brand-50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <div className="w-12 h-12 bg-brand-800 rounded-full flex items-center justify-center text-white font-bold text-lg">
+        <div className="bg-brand-900 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <div className="w-12 h-12 bg-brand-700 rounded-full flex items-center justify-center text-white font-bold text-lg">
             {user?.full_name?.charAt(0)}
           </div>
           <div>
-            <p className="font-semibold text-brand-900">{user?.full_name}</p>
-            <p className="text-sm text-brand-600">{user?.email}</p>
-            <span className="text-xs bg-brand-800 text-white px-2 py-0.5 rounded-full mt-1 inline-block">
+            <p className="font-semibold text-white">{user?.full_name}</p>
+            <p className="text-sm text-brand-300">{user?.email}</p>
+            <span className="text-xs bg-[#c9a84c] text-white px-2 py-0.5 rounded-full mt-1 inline-block">
               {user?.role === 'owner' ? 'Geschäftsführer' : user?.role === 'hr' ? 'HR Manager' : 'Administrator'}
             </span>
           </div>
         </div>
         <form onSubmit={saveProfile} className="space-y-4">
-          <div>
-            <label className="label">Vollständiger Name</label>
-            <input type="text" className="input" value={fullName} onChange={e => setFullName(e.target.value)} required />
-          </div>
-          <div>
-            <label className="label">Telefon</label>
-            <input type="text" className="input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+49 ..." />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className="label">Vollständiger Name</label>
+              <input type="text" className="input" value={fullName} onChange={e => setFullName(e.target.value)} required />
+            </div>
+            <div>
+              <label className="label">Telefon</label>
+              <input type="text" className="input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+49 ..." />
+            </div>
+            <div>
+              <label className="label">Geburtsdatum</label>
+              <input type="date" className="input" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+            </div>
+            <div className="col-span-2">
+              <label className="label">Adresse</label>
+              <input type="text" className="input" value={address} onChange={e => setAddress(e.target.value)} placeholder="Musterstraße 1, 12345 Berlin" />
+            </div>
           </div>
           {profileError && <p className="text-red-600 text-sm bg-red-50 px-4 py-3 rounded-lg">{profileError}</p>}
           {profileMsg && <p className="text-green-700 text-sm bg-green-50 px-4 py-3 rounded-lg">{profileMsg}</p>}
