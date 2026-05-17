@@ -96,11 +96,11 @@ export default function AdminSettings() {
 
   return (
     <div className="p-8 max-w-2xl">
-      <h1 className="page-title mb-6">⚙️ Einstellungen</h1>
+      <h1 className="page-title mb-6">Einstellungen</h1>
 
       <div className="card p-6 mb-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="section-title">👤 Mein Profil</h2>
+          <h2 className="section-title">Mein Profil</h2>
           {!editing && (
             <button onClick={() => setEditing(true)} className="btn-secondary text-sm">
               Bearbeiten
