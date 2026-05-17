@@ -6,13 +6,13 @@ import { sendDocumentUploaded } from '@/lib/email'
 export async function GET(req: Request) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  if (!session) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
   const userId = searchParams.get('user_id') || session.id
 
   if (session.role === 'employee' && userId !== session.id)
-    return NextResponse.json({ error: 'غير مصرح' }, { status: 403 })
+    return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 403 })
 
   const { data, error } = await supabaseAdmin
     .from('documents')
@@ -30,7 +30,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session) return NextResponse.json({ error: 'غير مصرح' }, { status: 401 })
+  if (!session) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   try {
     const formData = await req.formData()
@@ -38,9 +38,9 @@ export async function POST(req: Request) {
     const documentTypeId = formData.get('document_type_id') as string
     const expiryDate = formData.get('expiry_date') as string | null
     const issueDate = formData.get('issue_date') as string | null
-    const userId = session.role === 'admin' ? (formData.get('user_id') as string || session.id) : session.id
+    const userId = session.role === 'employee' ? session.id : (formData.get('user_id') as string || session.id)
 
-    if (!documentTypeId) return NextResponse.json({ error: 'نوع الوثيقة مطلوب' }, { status: 400 })
+    if (!documentTypeId) return NextResponse.json({ error: 'Dokumenttyp erforderlich' }, { status: 400 })
 
     let fileUrl: string | null = null
     let fileName: string | null = null
@@ -88,17 +88,26 @@ export async function POST(req: Request) {
       doc = data
     }
 
+    // لما الموظف يرفع ملف، ابعت إشعار للـ HR والـ Admin والـ Owner
     if (session.role === 'employee') {
-      const { data: docType } = await supabaseAdmin.from('document_types').select('name_ar').eq('id', documentTypeId).single()
-      const { data: admins } = await supabaseAdmin.from('users').select('email').eq('role', 'admin')
+      const { data: docType } = await supabaseAdmin.from('document_types').select('name_de').eq('id', documentTypeId).single()
       const { data: employee } = await supabaseAdmin.from('users').select('full_name').eq('id', userId).single()
+      const { data: admins } = await supabaseAdmin.from('users').select('id, email').in('role', ['admin', 'hr', 'owner'])
+
       for (const admin of admins || []) {
-        try { await sendDocumentUploaded(admin.email, employee?.full_name || '', docType?.name_ar || '') } catch {}
+        // إشعار داخلي
+        await supabaseAdmin.from('in_app_notifications').insert({
+          user_id: admin.id,
+          title: 'Neues Dokument hochgeladen',
+          message: `${employee?.full_name} hat ${docType?.name_de} hochgeladen`,
+        })
+        // إيميل
+        try { await sendDocumentUploaded(admin.email, employee?.full_name || '', docType?.name_de || '') } catch {}
       }
     }
 
     return NextResponse.json(doc, { status: 201 })
   } catch (e: any) {
-    return NextResponse.json({ error: e.message || 'خطأ في الخادم' }, { status: 500 })
+    return NextResponse.json({ error: e.message || 'Serverfehler' }, { status: 500 })
   }
 }

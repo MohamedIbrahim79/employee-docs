@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { UserPayload } from '@/lib/auth'
 import clsx from 'clsx'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function PyramidLogo({ size = 9 }: { size?: number }) {
   return (
@@ -27,6 +27,26 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
   const pathname = usePathname()
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [unread, setUnread] = useState(0)
+
+  function getToken() {
+    return localStorage.getItem('auth_token') ||
+      document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
+  }
+
+  async function loadUnread() {
+    const res = await fetch('/api/in-app-notifications', {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
+    const data = await res.json()
+    setUnread((data || []).filter((n: any) => !n.is_read).length)
+  }
+
+  useEffect(() => {
+    loadUnread()
+    const interval = setInterval(loadUnread, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const links = [
     { href: '/admin', label: 'Dashboard', icon: '📊', exact: true },
@@ -62,7 +82,12 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
             return (
               <Link key={l.href} href={l.href} className={clsx('sidebar-link', active && 'active')}>
                 <span>{l.icon}</span>
-                <span>{l.label}</span>
+                <span className="flex-1">{l.label}</span>
+                {l.href === '/admin/alerts' && unread > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                    {unread}
+                  </span>
+                )}
               </Link>
             )
           })}
@@ -96,17 +121,23 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
             <PyramidLogo size={8} />
             <p className="font-bold text-white text-sm">Schmeuser GmbH</p>
           </div>
-          <div className="w-6" />
+          <Link href="/admin/alerts" className="relative text-white p-1">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            {unread > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                {unread}
+              </span>
+            )}
+          </Link>
         </div>
       </div>
 
       {/* Mobile Overlay */}
       {open && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          {/* Backdrop */}
           <div className="fixed inset-0 bg-black/50" onClick={() => setOpen(false)} />
-
-          {/* Sidebar */}
           <aside className="relative w-72 bg-brand-900 flex flex-col shadow-2xl h-full">
             <div className="p-5 border-b border-brand-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -133,7 +164,12 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
                     onClick={() => setOpen(false)}
                     className={clsx('sidebar-link', active && 'active')}>
                     <span>{l.icon}</span>
-                    <span>{l.label}</span>
+                    <span className="flex-1">{l.label}</span>
+                    {l.href === '/admin/alerts' && unread > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                        {unread}
+                      </span>
+                    )}
                   </Link>
                 )
               })}
