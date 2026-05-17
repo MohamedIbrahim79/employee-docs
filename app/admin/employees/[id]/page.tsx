@@ -85,21 +85,20 @@ export default function EmployeeDetail() {
             <div className="flex items-center gap-3 flex-wrap">
               <h1 className="text-xl font-bold text-gray-900">{employee.full_name}</h1>
               <span className={`badge ${employee.is_active ? 'badge-green' : 'badge-gray'}`}>
-                {employee.is_active ? '✅ Aktiv' : '⏸ Inaktiv'}
+                {employee.is_active ? 'Aktiv' : 'Inaktiv'}
               </span>
             </div>
-            <p className="text-gray-500 text-sm mt-1">📧 {employee.email}</p>
           </div>
           <div className="flex gap-2 flex-wrap">
             {msg && <span className="text-sm text-green-600 badge badge-green">{msg}</span>}
             <button onClick={sendReminders} disabled={sending} className="btn-secondary text-sm">
-              {sending ? '...' : '📨 Erinnerungen'}
+              {sending ? '...' : 'Erinnerungen'}
             </button>
             <button onClick={toggleActive} className={employee.is_active ? 'btn-secondary text-red-600 text-sm' : 'btn-primary text-sm'}>
-              {employee.is_active ? '⏸ Deaktivieren' : '▶️ Aktivieren'}
+              {employee.is_active ? 'Deaktivieren' : 'Aktivieren'}
             </button>
             <button onClick={() => setShowDeleteConfirm(true)} className="btn-danger text-sm">
-              🗑 Löschen
+              Löschen
             </button>
           </div>
         </div>
@@ -109,18 +108,18 @@ export default function EmployeeDetail() {
         <button
           onClick={() => setActiveTab('info')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'info' ? 'bg-brand-800 text-white' : 'bg-white text-gray-600 border border-gray-200'}`}>
-          👤 Persönliche Daten
+          Persönliche Daten
         </button>
         <button
           onClick={() => setActiveTab('docs')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'docs' ? 'bg-brand-800 text-white' : 'bg-white text-gray-600 border border-gray-200'}`}>
-          📄 Dokumente ({docs.length})
+          Dokumente ({docs.length})
         </button>
       </div>
 
       {activeTab === 'info' && (
         <div className="card p-6">
-          <h2 className="section-title mb-6">👤 Persönliche Informationen</h2>
+          <h2 className="section-title mb-6">Persönliche Informationen</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
@@ -173,7 +172,6 @@ export default function EmployeeDetail() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
             <div className="text-center mb-6">
-              <div className="text-5xl mb-3">⚠️</div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Mitarbeiter löschen?</h2>
               <p className="text-gray-500 text-sm">
                 Möchten Sie <strong>{employee.full_name}</strong> wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
@@ -182,7 +180,7 @@ export default function EmployeeDetail() {
             <div className="flex gap-3">
               <button onClick={() => setShowDeleteConfirm(false)} className="btn-secondary flex-1 justify-center">Abbrechen</button>
               <button onClick={deleteEmployee} disabled={deleting} className="btn-danger flex-1 justify-center">
-                {deleting ? '...' : '🗑 Endgültig löschen'}
+                {deleting ? '...' : 'Löschen'}
               </button>
             </div>
           </div>

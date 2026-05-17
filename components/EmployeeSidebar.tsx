@@ -88,7 +88,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
             <PyramidLogo size={8} />
             <p className="font-bold text-white text-sm">Schmeuser GmbH</p>
           </div>
-          <button onClick={logout} className="text-red-400 text-sm px-2 py-1">🚪</button>
+          <div className="w-6" />
         </div>
       </div>
 
