@@ -70,7 +70,7 @@ function AlertRow({ alert }: { alert: any }) {
   return (
     <div className="flex items-center gap-4 px-5 py-4">
       <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${isExpired ? 'bg-red-500' : 'bg-yellow-400'}`} />
-      <div className="w-9 h-9 bg-brand-100 rounded-full flex items-center justify-center text-brand-800 font-bold text-sm shrink-0">
+      <div className="w-9 h-9 bg-brand-800 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
         {(alert.user as any)?.full_name?.charAt(0)}
       </div>
       <div className="flex-1 min-w-0">
@@ -81,7 +81,9 @@ function AlertRow({ alert }: { alert: any }) {
       <span className={`badge ${isExpired ? 'badge-red' : 'badge-yellow'}`}>
         {isExpired ? `Abgelaufen seit ${Math.abs(alert.daysLeft)} Tagen` : `Noch ${alert.daysLeft} Tage`}
       </span>
-      <Link href={`/admin/employees/${(alert.user as any)?.id}`} className="btn-secondary py-1.5 px-3 text-xs">Anzeigen</Link>
+      <Link href={`/admin/employees/${(alert.user as any)?.id}?tab=docs`} className="btn-secondary py-1.5 px-3 text-xs">
+        Anzeigen
+      </Link>
     </div>
   )
 }

@@ -1,18 +1,21 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import DocumentCard from '@/components/DocumentCard'
 
 export default function EmployeeDetail() {
   const { id } = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [employee, setEmployee] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [msg, setMsg] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [activeTab, setActiveTab] = useState<'info' | 'docs'>('info')
+  const [activeTab, setActiveTab] = useState<'info' | 'docs'>(
+    searchParams.get('tab') === 'docs' ? 'docs' : 'info'
+  )
 
   function getToken() {
     return localStorage.getItem('auth_token') ||
