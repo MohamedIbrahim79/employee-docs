@@ -12,7 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const token = localStorage.getItem('auth_token')
     const role = localStorage.getItem('user_role')
     if (!token) { router.push('/login'); return }
-    if (role !== 'admin') { router.push('/employee'); return }
+    if (role === 'employee') { router.push('/employee'); return }
 
     fetch('/api/auth/me', {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -26,7 +26,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       .catch(() => router.push('/login'))
   }, [])
 
-  if (loading) return <div className="flex items-center justify-center h-screen text-gray-400">جارٍ التحميل...</div>
+  if (loading) return <div className="flex items-center justify-center h-screen text-gray-400">Wird geladen...</div>
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
