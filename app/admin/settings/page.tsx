@@ -94,113 +94,124 @@ export default function AdminSettings() {
     setProfileError('')
   }
 
-  return (
-    <div className="p-8 max-w-2xl">
-      <h1 className="page-title mb-6">Einstellungen</h1>
+  function getRoleLabel(role: string) {
+    if (role === 'owner') return 'Geschäftsführer'
+    if (role === 'hr') return 'HR Manager'
+    return 'Administrator'
+  }
 
-      <div className="card p-6 mb-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="section-title">Mein Profil</h2>
+  return (
+    <div className="p-4 md:p-8 max-w-2xl">
+      <h1 className="page-title mb-8">Einstellungen</h1>
+
+      {/* Profile Card */}
+      <div className="card overflow-hidden mb-6">
+        {/* Header */}
+        <div className="bg-brand-900 px-6 py-8 relative">
+          <div className="flex items-end gap-4">
+            <div className="w-20 h-20 bg-[#c9a84c] rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-lg">
+              {user?.full_name?.charAt(0)}
+            </div>
+            <div className="pb-1">
+              <h2 className="text-xl font-bold text-white">{user?.full_name}</h2>
+              <p className="text-brand-300 text-sm">{user?.email}</p>
+              <span className="text-xs bg-white/20 text-white px-3 py-0.5 rounded-full mt-1.5 inline-block">
+                {getRoleLabel(user?.role || '')}
+              </span>
+            </div>
+          </div>
           {!editing && (
-            <button onClick={() => setEditing(true)} className="btn-secondary text-sm">
+            <button
+              onClick={() => setEditing(true)}
+              className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-1.5 rounded-lg transition-colors">
               Bearbeiten
             </button>
           )}
         </div>
 
-        <div className="bg-brand-900 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <div className="w-12 h-12 bg-brand-700 rounded-full flex items-center justify-center text-white font-bold text-lg">
-            {user?.full_name?.charAt(0)}
-          </div>
-          <div>
-            <p className="font-semibold text-white">{user?.full_name}</p>
-            <p className="text-sm text-brand-300">{user?.email}</p>
-            <span className="text-xs bg-[#c9a84c] text-white px-2 py-0.5 rounded-full mt-1 inline-block">
-              {user?.role === 'owner' ? 'Geschäftsführer' : user?.role === 'hr' ? 'HR Manager' : 'Administrator'}
-            </span>
-          </div>
+        {/* Body */}
+        <div className="p-6">
+          {!editing ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {[
+                { label: 'Vollständiger Name', value: user?.full_name },
+                { label: 'E-Mail', value: user?.email },
+                { label: 'Telefon', value: user?.phone },
+                { label: 'Geburtsdatum', value: user?.birth_date ? new Date(user.birth_date).toLocaleDateString('de-DE') : null },
+                { label: 'Adresse', value: user?.address, full: true },
+              ].map(item => (
+                <div key={item.label} className={item.full ? 'md:col-span-2' : ''}>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">{item.label}</p>
+                  <p className="text-gray-800 font-medium">{item.value || '—'}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <form onSubmit={saveProfile} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="label">Vollständiger Name</label>
+                  <input type="text" className="input" value={fullName} onChange={e => setFullName(e.target.value)} required />
+                </div>
+                <div className="col-span-2">
+                  <label className="label">E-Mail</label>
+                  <input type="text" className="input bg-gray-50 text-gray-400" value={user?.email || ''} disabled />
+                </div>
+                <div>
+                  <label className="label">Telefon</label>
+                  <input type="text" className="input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+49 ..." />
+                </div>
+                <div>
+                  <label className="label">Geburtsdatum</label>
+                  <input type="date" className="input" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
+                </div>
+                <div className="col-span-2">
+                  <label className="label">Adresse</label>
+                  <input type="text" className="input" value={address} onChange={e => setAddress(e.target.value)} placeholder="Musterstraße 1, 12345 Berlin" />
+                </div>
+              </div>
+              {profileError && <p className="text-red-600 text-sm bg-red-50 px-4 py-3 rounded-lg border border-red-100">{profileError}</p>}
+              {profileMsg && <p className="text-green-700 text-sm bg-green-50 px-4 py-3 rounded-lg border border-green-100">{profileMsg}</p>}
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={cancelEdit} className="btn-secondary flex-1 justify-center">Abbrechen</button>
+                <button type="submit" disabled={profileLoading} className="btn-primary flex-1 justify-center">
+                  {profileLoading ? 'Wird gespeichert...' : 'Speichern'}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
-
-        {!editing ? (
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Vollständiger Name</p>
-              <p className="text-gray-900">{user?.full_name || '—'}</p>
-            </div>
-            <div className="col-span-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">E-Mail</p>
-              <p className="text-gray-900">{user?.email || '—'}</p>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Telefon</p>
-              <p className="text-gray-900">{user?.phone || '—'}</p>
-            </div>
-            <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Geburtsdatum</p>
-              <p className="text-gray-900">{user?.birth_date ? new Date(user.birth_date).toLocaleDateString('de-DE') : '—'}</p>
-            </div>
-            <div className="col-span-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Adresse</p>
-              <p className="text-gray-900">{user?.address || '—'}</p>
-            </div>
-          </div>
-        ) : (
-          <form onSubmit={saveProfile} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <label className="label">Vollständiger Name</label>
-                <input type="text" className="input" value={fullName} onChange={e => setFullName(e.target.value)} required />
-              </div>
-              <div className="col-span-2">
-                <label className="label">E-Mail</label>
-                <input type="text" className="input bg-gray-50" value={user?.email || ''} disabled />
-              </div>
-              <div>
-                <label className="label">Telefon</label>
-                <input type="text" className="input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+49 ..." />
-              </div>
-              <div>
-                <label className="label">Geburtsdatum</label>
-                <input type="date" className="input" value={birthDate} onChange={e => setBirthDate(e.target.value)} />
-              </div>
-              <div className="col-span-2">
-                <label className="label">Adresse</label>
-                <input type="text" className="input" value={address} onChange={e => setAddress(e.target.value)} placeholder="Musterstraße 1, 12345 Berlin" />
-              </div>
-            </div>
-            {profileError && <p className="text-red-600 text-sm bg-red-50 px-4 py-3 rounded-lg">{profileError}</p>}
-            {profileMsg && <p className="text-green-700 text-sm bg-green-50 px-4 py-3 rounded-lg">{profileMsg}</p>}
-            <div className="flex gap-3">
-              <button type="button" onClick={cancelEdit} className="btn-secondary flex-1 justify-center">Abbrechen</button>
-              <button type="submit" disabled={profileLoading} className="btn-primary flex-1 justify-center">
-                {profileLoading ? 'Wird gespeichert...' : 'Speichern'}
-              </button>
-            </div>
-          </form>
-        )}
       </div>
 
-      <div className="card p-6 mb-5">
-        <h2 className="section-title mb-4">Passwort ändern</h2>
-        <form onSubmit={changePassword} className="space-y-4">
-          <div>
-            <label className="label">Aktuelles Passwort</label>
-            <input type="password" className="input" value={currentPw} onChange={e => setCurrentPw(e.target.value)} required />
-          </div>
-          <div>
-            <label className="label">Neues Passwort</label>
-            <input type="password" className="input" value={newPw} onChange={e => setNewPw(e.target.value)} required placeholder="Mindestens 8 Zeichen" />
-          </div>
-          <div>
-            <label className="label">Passwort bestätigen</label>
-            <input type="password" className="input" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} required />
-          </div>
-          {error && <p className="text-red-600 text-sm bg-red-50 px-4 py-3 rounded-lg">{error}</p>}
-          {msg && <p className="text-green-700 text-sm bg-green-50 px-4 py-3 rounded-lg">{msg}</p>}
-          <button type="submit" disabled={loading} className="btn-primary">
-            {loading ? 'Wird gespeichert...' : 'Passwort ändern'}
-          </button>
-        </form>
+      {/* Password Card */}
+      <div className="card overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <h2 className="font-semibold text-gray-800">Passwort ändern</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Mindestens 8 Zeichen</p>
+        </div>
+        <div className="p-6">
+          <form onSubmit={changePassword} className="space-y-4">
+            <div>
+              <label className="label">Aktuelles Passwort</label>
+              <input type="password" className="input" value={currentPw} onChange={e => setCurrentPw(e.target.value)} required />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="label">Neues Passwort</label>
+                <input type="password" className="input" value={newPw} onChange={e => setNewPw(e.target.value)} required placeholder="Min. 8 Zeichen" />
+              </div>
+              <div>
+                <label className="label">Passwort bestätigen</label>
+                <input type="password" className="input" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} required />
+              </div>
+            </div>
+            {error && <p className="text-red-600 text-sm bg-red-50 px-4 py-3 rounded-lg border border-red-100">{error}</p>}
+            {msg && <p className="text-green-700 text-sm bg-green-50 px-4 py-3 rounded-lg border border-green-100">{msg}</p>}
+            <button type="submit" disabled={loading} className="btn-primary">
+              {loading ? 'Wird gespeichert...' : 'Passwort ändern'}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   )
