@@ -19,7 +19,6 @@ export default function AdminNotifications() {
     setNotifications(Array.isArray(data) ? data : [])
     setLoading(false)
 
-    // علّم كل الإشعارات كمقروءة
     await fetch('/api/in-app-notifications', {
       method: 'PATCH',
       headers: { 'Authorization': `Bearer ${getToken()}` }
@@ -51,6 +50,13 @@ export default function AdminNotifications() {
                     {new Date(n.created_at).toLocaleDateString('de-DE')} — {new Date(n.created_at).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
+                {n.metadata?.employee_id && (
+                  <Link
+                    href={`/admin/employees/${n.metadata.employee_id}?tab=docs`}
+                    className="btn-secondary py-1.5 px-3 text-xs shrink-0">
+                    Öffnen
+                  </Link>
+                )}
               </div>
             </div>
           ))}

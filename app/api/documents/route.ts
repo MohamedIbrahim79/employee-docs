@@ -100,6 +100,7 @@ export async function POST(req: Request) {
           user_id: admin.id,
           title: 'Neues Dokument hochgeladen',
           message: `${employee?.full_name} hat ${docType?.name_de} hochgeladen`,
+          metadata: { employee_id: userId }
         })
         // إيميل
         try { await sendDocumentUploaded(admin.email, employee?.full_name || '', docType?.name_de || '') } catch {}
