@@ -12,7 +12,6 @@ export async function PUT(req: Request) {
   const body = await req.json()
   const { full_name, phone, address, birth_date } = body
 
-  // أولاً جيب الـ user من قاعدة البيانات عشان نتأكد من الـ id
   const { data: userData } = await supabaseAdmin
     .from('users')
     .select('id')
@@ -21,7 +20,7 @@ export async function PUT(req: Request) {
 
   if (!userData) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-  const { data, error } = await supabaseAdmin
+  await supabaseAdmin
     .from('users')
     .update({ 
       full_name, 
@@ -30,9 +29,13 @@ export async function PUT(req: Request) {
       birth_date: birth_date || null 
     })
     .eq('id', userData.id)
-    .select()
+
+  // جيب البيانات الجديدة بعد التحديث
+  const { data } = await supabaseAdmin
+    .from('users')
+    .select('id, email, full_name, role, phone, address, birth_date, is_active')
+    .eq('id', userData.id)
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
