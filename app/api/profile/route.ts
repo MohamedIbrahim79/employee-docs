@@ -32,7 +32,9 @@ export async function PUT(req: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // جيب البيانات الجديدة مباشرة من قاعدة البيانات
+  // انتظر ثانية عشان Supabase يحدث البيانات
+  await new Promise(resolve => setTimeout(resolve, 500))
+
   const { data: freshData } = await supabaseAdmin
     .from('users')
     .select('id, email, full_name, role, phone, address, birth_date, is_active')
