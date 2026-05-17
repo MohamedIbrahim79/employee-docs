@@ -106,8 +106,7 @@ export default function AdminSettings() {
 
       {/* Profile Card */}
       <div className="card overflow-hidden mb-6">
-        {/* Header */}
-        <div className="bg-brand-900 px-6 py-6">
+        <div className="bg-brand-900 px-4 py-4">
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 bg-[#c9a84c] rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg shrink-0">
               {user?.full_name?.charAt(0)}
@@ -122,7 +121,7 @@ export default function AdminSettings() {
                 {!editing && (
                   <button
                     onClick={() => setEditing(true)}
-                    className="bg-white/10 hover:bg-white/20 text-white text-xs px-3 py-0.5 rounded-full transition-colors">
+                    className="bg-[#c9a84c] hover:bg-[#b8973b] text-white text-xs px-3 py-0.5 rounded-full transition-colors">
                     Bearbeiten
                   </button>
                 )}
@@ -131,7 +130,6 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        {/* Body */}
         <div className="p-6">
           {!editing ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -187,8 +185,8 @@ export default function AdminSettings() {
 
       {/* Password Card */}
       <div className="card overflow-hidden mb-6">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-          <h2 className="font-semibold text-gray-800">Passwort ändern</h2>
+        <div className="px-6 py-4 border-b border-gray-100 bg-brand-900/5">
+          <h2 className="font-semibold text-brand-900">Passwort ändern</h2>
           <p className="text-xs text-gray-500 mt-0.5">Mindestens 8 Zeichen</p>
         </div>
         <div className="p-6">
