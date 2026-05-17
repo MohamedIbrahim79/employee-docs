@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 async function getDashboardData() {
   const [{ data: employees }, { data: documents }] = await Promise.all([
-    supabaseAdmin.from('users').select('id, full_name, email, phone, start_date, is_active').eq('role', 'employee'),
+    supabaseAdmin.from('users').select('id, full_name, is_active').eq('role', 'employee'),
     supabaseAdmin.from('documents').select(`
       id, expiry_date, status, file_url,
       user:user_id(id, full_name, email, is_active),
@@ -97,14 +97,7 @@ export default async function AdminDashboard() {
               <div className="w-9 h-9 bg-brand-800 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
                 {emp.full_name.charAt(0)}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">{emp.full_name}</p>
-                <div className="flex gap-3 mt-0.5">
-                  <p className="text-xs text-gray-400">📧 {emp.email}</p>
-                  {emp.phone && <p className="text-xs text-gray-400">📞 {emp.phone}</p>}
-                  {emp.start_date && <p className="text-xs text-gray-400">📅 {new Date(emp.start_date).toLocaleDateString('de-DE')}</p>}
-                </div>
-              </div>
+              <p className="text-sm font-medium text-gray-900 flex-1">{emp.full_name}</p>
               <Link href={`/admin/employees/${emp.id}`} className="btn-secondary text-xs py-1.5 px-3">
                 Öffnen
               </Link>
