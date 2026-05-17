@@ -24,8 +24,11 @@ export default function AdminSettings() {
 
   async function loadProfile() {
     const res = await fetch(`/api/auth/me?t=${Date.now()}`, {
-      headers: { 'Authorization': `Bearer ${getToken()}` },
-      cache: 'no-store'
+      headers: { 
+        'Authorization': `Bearer ${getToken()}`,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      },
     })
     const data = await res.json()
     setUser(data)
