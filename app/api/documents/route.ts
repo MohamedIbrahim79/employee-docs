@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   const { data, error } = await supabaseAdmin
     .from('documents')
     .select(`
-      id, file_url, file_name, file_size, expiry_date, issue_date, status, notes, uploaded_at, updated_at,
+      id, file_url, file_name, file_size, expiry_date, issue_date, status, notes, uploaded_at, updated_at, bewacher_id,
       document_type:document_type_id(id, name_ar, name_de, has_expiry, is_required)
     `)
     .eq('user_id', userId)
@@ -37,6 +37,7 @@ export async function POST(req: Request) {
     const documentTypeId = formData.get('document_type_id') as string
     const expiryDate = formData.get('expiry_date') as string | null
     const issueDate = formData.get('issue_date') as string | null
+    const bewacherId = formData.get('bewacher_id') as string | null
     const userId = session.role === 'employee' ? session.id : (formData.get('user_id') as string || session.id)
 
     if (!documentTypeId) return NextResponse.json({ error: 'Dokumenttyp erforderlich' }, { status: 400 })
@@ -73,7 +74,19 @@ export async function POST(req: Request) {
     if (existing) {
       const { data } = await supabaseAdmin
         .from('documents')
-        .update({ file_url: fileUrl, file_name: fileName, file_size: fileSize, expiry_date: expiryDate || null, issue_date: issueDate || null, status: 'pending', notes: null, reviewed_by: null, reviewed_at: null, uploaded_at: new Date().toISOString() })
+        .update({
+          file_url: fileUrl,
+          file_name: fileName,
+          file_size: fileSize,
+          expiry_date: expiryDate || null,
+          issue_date: issueDate || null,
+          bewacher_id: bewacherId || null,
+          status: 'pending',
+          notes: null,
+          reviewed_by: null,
+          reviewed_at: null,
+          uploaded_at: new Date().toISOString()
+        })
         .eq('id', existing.id)
         .select()
         .single()
@@ -81,7 +94,17 @@ export async function POST(req: Request) {
     } else {
       const { data } = await supabaseAdmin
         .from('documents')
-        .insert({ user_id: userId, document_type_id: documentTypeId, file_url: fileUrl, file_name: fileName, file_size: fileSize, expiry_date: expiryDate || null, issue_date: issueDate || null, status: 'pending' })
+        .insert({
+          user_id: userId,
+          document_type_id: documentTypeId,
+          file_url: fileUrl,
+          file_name: fileName,
+          file_size: fileSize,
+          expiry_date: expiryDate || null,
+          issue_date: issueDate || null,
+          bewacher_id: bewacherId || null,
+          status: 'pending'
+        })
         .select()
         .single()
       doc = data
