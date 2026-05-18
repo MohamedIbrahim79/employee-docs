@@ -13,5 +13,5 @@ export default function Home() {
     router.push('/employee')
   }, [])
 
-  return <div className="flex items-center justify-center h-screen text-gray-400">جارٍ التحميل...</div>
+  return <div className="flex items-center justify-center h-screen text-gray-400">Wird geladen...</div>
 }
