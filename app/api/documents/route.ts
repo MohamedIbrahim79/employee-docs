@@ -42,6 +42,9 @@ export async function POST(req: Request) {
 
     if (!documentTypeId) return NextResponse.json({ error: 'Dokumenttyp erforderlich' }, { status: 400 })
 
+    // لو مفيش ملف ومفيش bewacher_id → error
+    if (!file && !bewacherId) return NextResponse.json({ error: 'Bitte Datei oder Bewacher-ID angeben' }, { status: 400 })
+
     let fileUrl: string | null = null
     let fileName: string | null = null
     let fileSize: number | null = null
@@ -63,6 +66,11 @@ export async function POST(req: Request) {
       fileSize = file.size
     }
 
+    // لو bewacher_id موجود وعمل submit بدون ملف
+    const hasBewacherId = !!bewacherId && bewacherId.trim() !== ''
+    const effectiveFileUrl = fileUrl || (hasBewacherId ? `bewacher:${bewacherId}` : null)
+    const effectiveFileName = fileName || (hasBewacherId ? `ID: ${bewacherId}` : null)
+
     const { data: existing } = await supabaseAdmin
       .from('documents')
       .select('id')
@@ -75,8 +83,8 @@ export async function POST(req: Request) {
       const { data } = await supabaseAdmin
         .from('documents')
         .update({
-          file_url: fileUrl,
-          file_name: fileName,
+          file_url: effectiveFileUrl,
+          file_name: effectiveFileName,
           file_size: fileSize,
           expiry_date: expiryDate || null,
           issue_date: issueDate || null,
@@ -97,8 +105,8 @@ export async function POST(req: Request) {
         .insert({
           user_id: userId,
           document_type_id: documentTypeId,
-          file_url: fileUrl,
-          file_name: fileName,
+          file_url: effectiveFileUrl,
+          file_name: effectiveFileName,
           file_size: fileSize,
           expiry_date: expiryDate || null,
           issue_date: issueDate || null,
@@ -110,7 +118,7 @@ export async function POST(req: Request) {
       doc = data
     }
 
-    // إشعار داخلي فقط للـ HR والـ Admin والـ Owner
+    // إشعار داخلي للـ HR والـ Admin والـ Owner
     if (session.role === 'employee') {
       const { data: docType } = await supabaseAdmin.from('document_types').select('name_de').eq('id', documentTypeId).single()
       const { data: employee } = await supabaseAdmin.from('users').select('full_name').eq('id', userId).single()
