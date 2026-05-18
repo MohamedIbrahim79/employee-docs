@@ -50,26 +50,36 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-2xl mb-5"
-            style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)', boxShadow: '0 0 40px rgba(201,168,76,0.3)' }}>
-            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-14 h-14">
-              <polygon points="20,2 38,34 2,34" fill="#c9a84c" opacity="0.9"/>
-              <polygon points="20,9 32,34 8,34" fill="#1a2744"/>
-              <polygon points="20,16 28,34 12,34" fill="#c9a84c" opacity="0.6"/>
-            </svg>
+          <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-2xl mb-5">
+            {/* Glow behind logo */}
+            <div className="absolute w-40 h-40 rounded-full"
+              style={{ background: 'rgba(201,168,76,0.2)', filter: 'blur(40px)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+            <div className="relative z-10 flex items-center justify-center w-24 h-24 rounded-2xl"
+              style={{
+                background: 'rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                boxShadow: '0 0 40px rgba(201,168,76,0.25)'
+              }}>
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-14 h-14">
+                <polygon points="20,2 38,34 2,34" fill="#c9a84c" opacity="0.9"/>
+                <polygon points="20,9 32,34 8,34" fill="#1a2744"/>
+                <polygon points="20,16 28,34 12,34" fill="#c9a84c" opacity="0.6"/>
+              </svg>
+            </div>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-wide">Schmeuser GmbH</h1>
           <p className="text-[#c9a84c] text-sm mt-1 font-medium tracking-widest uppercase">Security Services</p>
           <p className="text-white/40 text-xs mt-3 tracking-wide">Mitarbeiter-Dokumentenverwaltung</p>
         </div>
 
-        {/* Card with glass effect */}
-        <div className="rounded-2xl shadow-2xl p-8"
+        {/* Card */}
+        <div className="rounded-2xl p-8"
           style={{
-            background: 'rgba(255,255,255,0.07)',
+            background: 'rgba(29,39,71,0.85)',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            boxShadow: '0 25px 50px rgba(0,0,0,0.4)'
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
           }}>
           <h2 className="text-xl font-bold text-white mb-6 text-center">Anmelden</h2>
 
@@ -80,11 +90,19 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
                 style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.15)',
+                  background: 'rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(255,255,255,0.12)',
                   color: 'white',
+                }}
+                onFocus={e => {
+                  e.target.style.border = '1px solid rgba(201,168,76,0.6)'
+                  e.target.style.boxShadow = '0 0 0 3px rgba(201,168,76,0.15)'
+                }}
+                onBlur={e => {
+                  e.target.style.border = '1px solid rgba(255,255,255,0.12)'
+                  e.target.style.boxShadow = 'none'
                 }}
                 placeholder="name@schmeuser.de"
                 required
@@ -96,11 +114,19 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all"
+                className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
                 style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.15)',
+                  background: 'rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(255,255,255,0.12)',
                   color: 'white',
+                }}
+                onFocus={e => {
+                  e.target.style.border = '1px solid rgba(201,168,76,0.6)'
+                  e.target.style.boxShadow = '0 0 0 3px rgba(201,168,76,0.15)'
+                }}
+                onBlur={e => {
+                  e.target.style.border = '1px solid rgba(255,255,255,0.12)'
+                  e.target.style.boxShadow = 'none'
                 }}
                 placeholder="••••••••"
                 required
@@ -116,18 +142,29 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl text-base font-semibold transition-all duration-200"
+              className="w-full py-3 rounded-xl text-base font-semibold transition-all duration-300"
               style={{
                 background: loading ? 'rgba(201,168,76,0.5)' : 'linear-gradient(135deg, #c9a84c, #b8973b)',
                 color: 'white',
-                boxShadow: '0 4px 20px rgba(201,168,76,0.3)'
+                boxShadow: '0 4px 20px rgba(201,168,76,0.3)',
+                transform: 'scale(1)',
+              }}
+              onMouseEnter={e => {
+                if (!loading) {
+                  (e.target as HTMLButtonElement).style.transform = 'scale(1.02)'
+                  ;(e.target as HTMLButtonElement).style.boxShadow = '0 8px 30px rgba(201,168,76,0.4)'
+                }
+              }}
+              onMouseLeave={e => {
+                (e.target as HTMLButtonElement).style.transform = 'scale(1)'
+                ;(e.target as HTMLButtonElement).style.boxShadow = '0 4px 20px rgba(201,168,76,0.3)'
               }}>
               {loading ? 'Anmeldung läuft...' : 'Anmelden'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-white/20 text-xs mt-6">
+        <p className="text-center text-gray-400 text-sm mt-6 tracking-wide">
           Internal Access Only
         </p>
       </div>
