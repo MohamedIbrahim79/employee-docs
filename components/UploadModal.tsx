@@ -21,11 +21,11 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
   const [error, setError] = useState('')
   const [progress, setProgress] = useState(0)
 
-  // IBAN mode
   const [bankMode, setBankMode] = useState<'card' | 'iban'>('card')
   const [iban, setIban] = useState('')
   const [bic, setBic] = useState('')
   const [bankName, setBankName] = useState('')
+  const [accountHolder, setAccountHolder] = useState('')
   const [ibanExpiry, setIbanExpiry] = useState('')
 
   const docNameDe = doc.document_type?.name_de || ''
@@ -62,6 +62,7 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
       fd.append('iban', iban)
       fd.append('bic', bic)
       fd.append('bank_name', bankName)
+      fd.append('account_holder', accountHolder)
 
       const res = await fetch('/api/documents', {
         method: 'POST',
@@ -129,7 +130,6 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
 
         <div className="p-6 space-y-5">
 
-          {/* Bank mode toggle */}
           {isBankDoc && (
             <div className="flex gap-2">
               <button
@@ -145,9 +145,12 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
             </div>
           )}
 
-          {/* IBAN Form */}
           {isBankDoc && bankMode === 'iban' ? (
             <div className="space-y-4">
+              <div>
+                <label className="label">Kontoinhaber <span className="text-red-500">*</span></label>
+                <input className="input" value={accountHolder} onChange={e => setAccountHolder(e.target.value)} placeholder="Max Mustermann" />
+              </div>
               <div>
                 <label className="label">IBAN <span className="text-red-500">*</span></label>
                 <input className="input font-mono" value={iban} onChange={e => setIban(e.target.value.toUpperCase())} placeholder="DE00 0000 0000 0000 0000 00" />
@@ -169,7 +172,6 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
             </div>
           ) : (
             <>
-              {/* File Upload */}
               <div>
                 <label className="label">Datei (Foto oder PDF)</label>
                 <div
@@ -195,7 +197,6 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
                 <p className="text-xs text-gray-400 mt-2">Nur klare Fotos oder PDFs. Maximale Dateigröße: 10 MB</p>
               </div>
 
-              {/* Expiry Date for bank card */}
               {isBankDoc && (
                 <div>
                   <label className="label">Ablaufdatum <span className="text-red-500">*</span></label>

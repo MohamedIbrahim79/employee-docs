@@ -208,20 +208,7 @@ export default function EmployeeProfile() {
         </div>
       </div>
 
-      {/* Hints */}
-      <div className="card overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-brand-900/5">
-          <h2 className="font-semibold text-brand-900">Hinweise zum Hochladen</h2>
-        </div>
-        <div className="p-6">
-          <ul className="text-sm text-gray-600 space-y-2">
-            <li>Akzeptiert: Klare Fotos (JPG, PNG) oder PDF-Dateien</li>
-            <li>Maximale Dateigröße: 10 MB</li>
-            <li>Stellen Sie sicher, dass das Foto klar und nicht abgeschnitten ist</li>
-            <li>Sie erhalten Erinnerungs-E-Mails 30 Tage vor Ablauf</li>
-          </ul>
-        </div>
-      </div>
+    
     </div>
   )
 }
