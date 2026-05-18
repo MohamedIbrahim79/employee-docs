@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 
 const COMPANY = process.env.COMPANY_NAME || 'Schmeuser GmbH'
-const SITE_URL = 'https://employee-docs.vercel.app'
+const SITE_URL = 'https://schmeuser.vercel.app'
 
 function getTransporter() {
   return nodemailer.createTransport({
