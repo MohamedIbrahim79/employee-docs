@@ -55,6 +55,17 @@ export default function EmployeeDocs() {
   const expired = docs.filter(d => d.expiry_date && d.file_url && new Date(d.expiry_date) < today).length
   const missing = docs.filter(d => !d.file_url).length
 
+  const stats = [
+    { label: 'Hochgeladen', value: uploaded, color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-100',
+      icon: <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
+    { label: 'Fehlend', value: missing, color: 'text-gray-600', bg: 'bg-gray-50', border: 'border-gray-100',
+      icon: <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> },
+    { label: 'Läuft bald ab', value: expiring, color: 'text-yellow-700', bg: 'bg-yellow-50', border: 'border-yellow-100',
+      icon: <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> },
+    { label: 'Abgelaufen', value: expired, color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-100',
+      icon: <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg> },
+  ]
+
   return (
     <div className="p-4 md:p-8">
       <div className="mb-6">
@@ -63,15 +74,13 @@ export default function EmployeeDocs() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        {[
-          { label: 'Hochgeladen', value: uploaded, color: 'text-green-700' },
-          { label: 'Fehlend', value: missing, color: 'text-gray-600' },
-          { label: 'Läuft bald ab', value: expiring, color: 'text-yellow-700' },
-          { label: 'Abgelaufen', value: expired, color: 'text-red-700' },
-        ].map(s => (
-          <div key={s.label} className="stat-card">
-            <div className="text-sm font-semibold text-gray-500 mb-1">{s.label}</div>
-            <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+        {stats.map(s => (
+          <div key={s.label} className={`card p-4 border ${s.border} ${s.bg} flex items-center gap-3`}>
+            <div className="shrink-0">{s.icon}</div>
+            <div>
+              <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
+              <div className="text-xs text-gray-500">{s.label}</div>
+            </div>
           </div>
         ))}
       </div>
