@@ -10,8 +10,9 @@ interface Props {
 }
 
 const ISSUE_DATE_ONLY_DOCS = ['Führungszeugnis']
-const NO_DATES_DOCS = ['Steuer-ID', 'Sozialversicherungsnummer']
+const NO_DATES_DOCS = ['Steuer-ID', 'Sozialversicherungsnummer', 'Bewacher_ID']
 const BANK_DOC = 'Bankkarte / IBAN'
+const BEWACHER_ID_DOC = 'Bewacher_ID'
 
 export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
   const [file, setFile] = useState<File | null>(null)
@@ -27,11 +28,13 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
   const [bankName, setBankName] = useState('')
   const [accountHolder, setAccountHolder] = useState('')
   const [ibanExpiry, setIbanExpiry] = useState('')
+  const [bewacherId, setBewacherId] = useState('')
 
   const docNameDe = doc.document_type?.name_de || ''
   const isIssueDateOnly = ISSUE_DATE_ONLY_DOCS.includes(docNameDe)
   const isNoDates = NO_DATES_DOCS.includes(docNameDe)
   const isBankDoc = docNameDe === BANK_DOC
+  const isBewacherDoc = docNameDe === BEWACHER_ID_DOC
   const showExpiryDate = doc.document_type?.has_expiry && !isIssueDateOnly && !isNoDates && !isBankDoc
 
   const onDrop = useCallback((accepted: File[]) => {
@@ -47,14 +50,34 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
   })
 
   async function handleUpload() {
+    const token = localStorage.getItem('auth_token') ||
+      document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
+
+    // Bewacher ID mode
+    if (isBewacherDoc) {
+      if (!bewacherId.trim()) { setError('Bitte Bewacher-ID eingeben'); return }
+      setUploading(true); setError(''); setProgress(50)
+      const fd = new FormData()
+      fd.append('document_type_id', doc.document_type?.id)
+      fd.append('user_id', userId)
+      fd.append('bewacher_id', bewacherId)
+      const res = await fetch('/api/documents', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: fd
+      })
+      const data = await res.json()
+      setProgress(100)
+      if (!res.ok) { setError(data.error || 'Fehler'); setUploading(false); return }
+      onDone()
+      return
+    }
+
+    // IBAN mode
     if (isBankDoc && bankMode === 'iban') {
       if (!iban) { setError('Bitte IBAN eingeben'); return }
       if (!ibanExpiry) { setError('Bitte Ablaufdatum eingeben'); return }
-
       setUploading(true); setError(''); setProgress(50)
-      const token = localStorage.getItem('auth_token') ||
-        document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
-
       const fd = new FormData()
       fd.append('document_type_id', doc.document_type?.id)
       fd.append('user_id', userId)
@@ -63,7 +86,6 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
       fd.append('bic', bic)
       fd.append('bank_name', bankName)
       fd.append('account_holder', accountHolder)
-
       const res = await fetch('/api/documents', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -99,8 +121,6 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
       if (issueDate) fd.append('issue_date', issueDate)
 
       setProgress(60)
-      const token = localStorage.getItem('auth_token') ||
-        document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
       const res = await fetch('/api/documents', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -130,6 +150,21 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
 
         <div className="p-6 space-y-5">
 
+          {/* Bewacher ID */}
+          {isBewacherDoc && (
+            <div>
+              <label className="label">Bewacher-ID Nummer <span className="text-red-500">*</span></label>
+              <input
+                className="input font-mono"
+                value={bewacherId}
+                onChange={e => setBewacherId(e.target.value)}
+                placeholder="z.B. 123456789"
+              />
+              <p className="text-xs text-gray-400 mt-1">Geben Sie Ihre Bewacher-Identifikationsnummer ein</p>
+            </div>
+          )}
+
+          {/* Bank mode toggle */}
           {isBankDoc && (
             <div className="flex gap-2">
               <button
@@ -145,6 +180,7 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
             </div>
           )}
 
+          {/* IBAN Form */}
           {isBankDoc && bankMode === 'iban' ? (
             <div className="space-y-4">
               <div>
@@ -170,7 +206,7 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
                 <input type="month" className="input" value={ibanExpiry} onChange={e => setIbanExpiry(e.target.value)} />
               </div>
             </div>
-          ) : (
+          ) : !isBewacherDoc && (
             <>
               <div>
                 <label className="label">Datei (Foto oder PDF)</label>
@@ -200,25 +236,18 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
               {isBankDoc && (
                 <div>
                   <label className="label">Ablaufdatum <span className="text-red-500">*</span></label>
-                  <input
-                    type="month"
-                    className="input"
+                  <input type="month" className="input"
                     value={expiryDate ? expiryDate.substring(0, 7) : ''}
-                    onChange={e => setExpiryDate(e.target.value + '-01')}
-                  />
+                    onChange={e => setExpiryDate(e.target.value + '-01')} />
                 </div>
               )}
 
               {showExpiryDate && (
                 <div>
                   <label className="label">Ablaufdatum <span className="text-red-500">*</span></label>
-                  <input
-                    type="date"
-                    className="input"
-                    value={expiryDate}
+                  <input type="date" className="input" value={expiryDate}
                     onChange={e => setExpiryDate(e.target.value)}
-                    min={new Date().toISOString().split('T')[0]}
-                  />
+                    min={new Date().toISOString().split('T')[0]} />
                 </div>
               )}
 
@@ -237,7 +266,7 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
           {uploading && progress > 0 && (
             <div>
               <div className="flex justify-between text-xs text-gray-500 mb-1">
-                <span>Wird hochgeladen...</span>
+                <span>Wird gespeichert...</span>
                 <span>{progress}%</span>
               </div>
               <div className="bg-gray-100 rounded-full h-2 overflow-hidden">
@@ -250,7 +279,7 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
         <div className="p-6 pt-0 flex gap-3">
           <button onClick={onClose} className="btn-secondary flex-1 justify-center">Abbrechen</button>
           <button onClick={handleUpload} disabled={uploading} className="btn-primary flex-1 justify-center">
-            {uploading ? 'Wird hochgeladen...' : 'Speichern'}
+            {uploading ? 'Wird gespeichert...' : 'Speichern'}
           </button>
         </div>
       </div>
