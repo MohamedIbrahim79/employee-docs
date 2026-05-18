@@ -53,7 +53,7 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md relative z-10">
 
-        {/* Logo - fade down animation */}
+        {/* Logo */}
         <div
           className="text-center mb-8 transition-all duration-700"
           style={{
@@ -61,8 +61,9 @@ export default function LoginPage() {
             transform: mounted ? 'translateY(0)' : 'translateY(-20px)'
           }}>
           <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-5">
+            {/* Glow - خففناه */}
             <div className="absolute w-36 h-36 rounded-full"
-              style={{ background: 'rgba(201,168,76,0.25)', filter: 'blur(35px)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+              style={{ background: 'rgba(201,168,76,0.12)', filter: 'blur(35px)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
             <div className="relative z-10 flex items-center justify-center w-20 h-20 rounded-2xl"
               style={{
                 background: 'rgba(255,255,255,0.08)',
@@ -82,7 +83,7 @@ export default function LoginPage() {
           <p className="text-white/40 text-xs mt-3 tracking-wide">Mitarbeiter-Dokumentenverwaltung</p>
         </div>
 
-        {/* Card - scale in animation */}
+        {/* Card */}
         <div
           className="rounded-2xl p-8 transition-all duration-700 delay-200"
           style={{
@@ -163,13 +164,13 @@ export default function LoginPage() {
               }}
               onMouseEnter={e => {
                 if (!loading) {
-                  (e.currentTarget).style.transform = 'scale(1.02)'
-                  ;(e.currentTarget).style.boxShadow = '0 8px 30px rgba(201,168,76,0.4)'
+                  e.currentTarget.style.transform = 'scale(1.02)'
+                  e.currentTarget.style.boxShadow = '0 0 30px rgba(212,175,55,0.35)'
                 }
               }}
               onMouseLeave={e => {
-                (e.currentTarget).style.transform = 'scale(1)'
-                ;(e.currentTarget).style.boxShadow = '0 4px 20px rgba(201,168,76,0.3)'
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(201,168,76,0.3)'
               }}>
               {loading ? (
                 <>
