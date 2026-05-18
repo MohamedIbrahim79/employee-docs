@@ -26,7 +26,7 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
       .catch(() => router.push('/login'))
   }, [])
 
-  if (loading) return <div className="flex items-center justify-center h-screen text-gray-400">جارٍ التحميل...</div>
+  if (loading) return <div className="flex items-center justify-center h-screen text-gray-400">Wird geladen...</div>
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
