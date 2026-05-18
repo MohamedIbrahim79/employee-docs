@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
@@ -7,7 +7,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setTimeout(() => setMounted(true), 50)
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -36,32 +41,36 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #0f1a2e 0%, #1a2744 50%, #0f1a2e 100%)' }}>
 
-      {/* Background effects */}
+      {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-20"
-          style={{ background: 'radial-gradient(circle, #c9a84c, transparent)' }} />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full opacity-20"
-          style={{ background: 'radial-gradient(circle, #c9a84c, transparent)' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full opacity-5"
-          style={{ background: 'radial-gradient(circle, #c9a84c, transparent)' }} />
+        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-20 animate-pulse"
+          style={{ background: 'radial-gradient(circle, #c9a84c, transparent)', animationDuration: '4s' }} />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full opacity-20 animate-pulse"
+          style={{ background: 'radial-gradient(circle, #c9a84c, transparent)', animationDuration: '6s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full opacity-5 animate-pulse"
+          style={{ background: 'radial-gradient(circle, #c9a84c, transparent)', animationDuration: '8s' }} />
       </div>
 
       <div className="w-full max-w-md relative z-10">
 
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-2xl mb-5">
-            {/* Glow behind logo */}
-            <div className="absolute w-40 h-40 rounded-full"
-              style={{ background: 'rgba(201,168,76,0.2)', filter: 'blur(40px)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
-            <div className="relative z-10 flex items-center justify-center w-24 h-24 rounded-2xl"
+        {/* Logo - fade down animation */}
+        <div
+          className="text-center mb-8 transition-all duration-700"
+          style={{
+            opacity: mounted ? 1 : 0,
+            transform: mounted ? 'translateY(0)' : 'translateY(-20px)'
+          }}>
+          <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-5">
+            <div className="absolute w-36 h-36 rounded-full"
+              style={{ background: 'rgba(201,168,76,0.25)', filter: 'blur(35px)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+            <div className="relative z-10 flex items-center justify-center w-20 h-20 rounded-2xl"
               style={{
                 background: 'rgba(255,255,255,0.08)',
                 backdropFilter: 'blur(12px)',
                 border: '1px solid rgba(255,255,255,0.15)',
                 boxShadow: '0 0 40px rgba(201,168,76,0.25)'
               }}>
-              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-14 h-14">
+              <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-12 h-12">
                 <polygon points="20,2 38,34 2,34" fill="#c9a84c" opacity="0.9"/>
                 <polygon points="20,9 32,34 8,34" fill="#1a2744"/>
                 <polygon points="20,16 28,34 12,34" fill="#c9a84c" opacity="0.6"/>
@@ -69,17 +78,20 @@ export default function LoginPage() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-wide">Schmeuser GmbH</h1>
-          <p className="text-[#c9a84c] text-sm mt-1 font-medium tracking-widest uppercase">Security Services</p>
+          <p className="text-[#c9a84c] text-sm mt-1 font-medium uppercase" style={{ letterSpacing: '0.25em' }}>Security Services</p>
           <p className="text-white/40 text-xs mt-3 tracking-wide">Mitarbeiter-Dokumentenverwaltung</p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl p-8"
+        {/* Card - scale in animation */}
+        <div
+          className="rounded-2xl p-8 transition-all duration-700 delay-200"
           style={{
             background: 'rgba(29,39,71,0.85)',
             backdropFilter: 'blur(20px)',
             border: '1px solid rgba(255,255,255,0.1)',
-            boxShadow: '0 25px 50px rgba(0,0,0,0.5)'
+            boxShadow: '0 20px 80px rgba(0,0,0,0.45)',
+            opacity: mounted ? 1 : 0,
+            transform: mounted ? 'scale(1)' : 'scale(0.97)'
           }}>
           <h2 className="text-xl font-bold text-white mb-6 text-center">Anmelden</h2>
 
@@ -142,29 +154,38 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl text-base font-semibold transition-all duration-300"
+              className="w-full py-3 rounded-xl text-base font-semibold transition-all duration-300 flex items-center justify-center gap-2"
               style={{
                 background: loading ? 'rgba(201,168,76,0.5)' : 'linear-gradient(135deg, #c9a84c, #b8973b)',
                 color: 'white',
                 boxShadow: '0 4px 20px rgba(201,168,76,0.3)',
-                transform: 'scale(1)',
+                opacity: loading ? 0.8 : 1,
               }}
               onMouseEnter={e => {
                 if (!loading) {
-                  (e.target as HTMLButtonElement).style.transform = 'scale(1.02)'
-                  ;(e.target as HTMLButtonElement).style.boxShadow = '0 8px 30px rgba(201,168,76,0.4)'
+                  (e.currentTarget).style.transform = 'scale(1.02)'
+                  ;(e.currentTarget).style.boxShadow = '0 8px 30px rgba(201,168,76,0.4)'
                 }
               }}
               onMouseLeave={e => {
-                (e.target as HTMLButtonElement).style.transform = 'scale(1)'
-                ;(e.target as HTMLButtonElement).style.boxShadow = '0 4px 20px rgba(201,168,76,0.3)'
+                (e.currentTarget).style.transform = 'scale(1)'
+                ;(e.currentTarget).style.boxShadow = '0 4px 20px rgba(201,168,76,0.3)'
               }}>
-              {loading ? 'Anmeldung läuft...' : 'Anmelden'}
+              {loading ? (
+                <>
+                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                  </svg>
+                  Anmeldung läuft...
+                </>
+              ) : 'Anmelden'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-gray-400 text-sm mt-6 tracking-wide">
+        <p className="text-center text-gray-400 text-sm mt-6 tracking-wide"
+          style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.7s ease 0.4s' }}>
           Internal Access Only
         </p>
       </div>
