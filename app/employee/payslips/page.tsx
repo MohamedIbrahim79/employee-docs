@@ -50,11 +50,7 @@ export default function EmployeePayslips() {
                   <p className="text-xs text-gray-400">{new Date(p.uploaded_at).toLocaleDateString('de-DE')}</p>
                 </div>
               </div>
-              
-                href={p.file_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-secondary py-1.5 px-3 text-xs">
+              <a href={p.file_url} target="_blank" rel="noopener noreferrer" className="btn-secondary py-1.5 px-3 text-xs">
                 Herunterladen
               </a>
             </div>
