@@ -120,7 +120,10 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
           </button>
           <div className="flex items-center gap-2">
             <PyramidLogo size={8} />
-            <p className="font-bold text-white text-sm">Schmeuser GmbH</p>
+            <div>
+              <p className="font-bold text-white text-sm leading-tight">Schmeuser GmbH</p>
+              <p className="text-[#c9a84c] text-xs font-medium uppercase" style={{ letterSpacing: '0.15em' }}>Security Services</p>
+            </div>
           </div>
           <button onClick={handleBellClick} className="relative text-white p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
