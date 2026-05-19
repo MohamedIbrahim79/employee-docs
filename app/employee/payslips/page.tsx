@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 const MONTHS = [
   'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
@@ -9,6 +10,8 @@ const MONTHS = [
 export default function EmployeePayslips() {
   const [payslips, setPayslips] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const searchParams = useSearchParams()
+  const highlightId = searchParams.get('id')
 
   function getToken() {
     return localStorage.getItem('auth_token') || ''
@@ -25,6 +28,15 @@ export default function EmployeePayslips() {
 
   useEffect(() => { load() }, [])
 
+  useEffect(() => {
+    if (highlightId && !loading) {
+      setTimeout(() => {
+        const el = document.getElementById(`payslip-${highlightId}`)
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 300)
+    }
+  }, [highlightId, loading])
+
   return (
     <div className="p-4 md:p-8 max-w-2xl">
       <h1 className="page-title mb-6">Lohnabrechnungen</h1>
@@ -38,7 +50,21 @@ export default function EmployeePayslips() {
       ) : (
         <div className="card divide-y divide-gray-50">
           {payslips.map(p => (
-            <div key={p.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+            <div
+              key={p.id}
+              id={`payslip-${p.id}`}
+              className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              style={highlightId === p.id ? {
+                transform: 'scale(1.02)',
+                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.18)',
+                borderRadius: '12px',
+                position: 'relative',
+                zIndex: 10,
+                transition: 'all 0.3s ease',
+                background: '#fffbeb',
+              } : {
+                transition: 'all 0.3s ease',
+              }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-brand-900/10 rounded-xl flex items-center justify-center">
                   <svg className="w-5 h-5 text-brand-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
