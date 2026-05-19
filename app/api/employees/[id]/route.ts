@@ -11,7 +11,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
   const { data: userData, error: userError } = await supabaseAdmin
     .from('users')
-    .select('id, email, full_name, role, phone, position, department, start_date, birth_date, address, is_active, created_at')
+    .select('id, email, full_name, role, phone, position, department, start_date, birth_date, address, is_active, created_at, personal_nr')
     .eq('id', params.id)
     .single()
 
