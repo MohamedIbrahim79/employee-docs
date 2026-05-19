@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 
   const { data, error } = await supabaseAdmin
     .from('users')
-    .select('id, email, full_name, role, phone, start_date, birth_date, address, is_active, created_at')
+    .select('id, email, full_name, role, phone, start_date, birth_date, address, is_active, created_at, personal_nr')
     .eq('role', 'employee')
     .order('created_at', { ascending: false })
 
@@ -25,7 +25,8 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
-    const { email, full_name, phone, start_date, birth_date, address } = body
+    const { email, full_name, phone, start_date, birth_date, address, personal_nr } = body
+
     if (!email || !full_name) return NextResponse.json({ error: 'Name und E-Mail sind erforderlich' }, { status: 400 })
 
     const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-4).toUpperCase()
@@ -42,6 +43,7 @@ export async function POST(req: Request) {
         start_date: start_date || null,
         birth_date: birth_date || null,
         address: address || null,
+        personal_nr: personal_nr || null,
       })
       .select()
       .single()
@@ -56,7 +58,6 @@ export async function POST(req: Request) {
     }
 
     try { await sendWelcomeEmail(email, full_name, tempPassword) } catch {}
-
     return NextResponse.json({ ...user2, temp_password: tempPassword }, { status: 201 })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })

@@ -10,7 +10,7 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
   const [form, setForm] = useState({
     first_name: '', last_name: '', email: '', phone: '',
     street: '', house_number: '', postal_code: '', city: '',
-    birth_date: '', start_date: ''
+    birth_date: '', start_date: '', personal_nr: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -42,6 +42,7 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
         address,
         birth_date: form.birth_date || null,
         start_date: form.start_date || null,
+        personal_nr: form.personal_nr || null,
       }),
     })
     const data = await res.json()
@@ -97,9 +98,14 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
                 <input className="input" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+49 ..." required />
               </div>
               <div>
-                <label className="label">Geburtsdatum <span className="text-red-500">*</span></label>
-                <input className="input" type="date" value={form.birth_date} onChange={e => set('birth_date', e.target.value)} required />
+                <label className="label">Personal-Nr.</label>
+                <input className="input" value={form.personal_nr} onChange={e => set('personal_nr', e.target.value)} placeholder="01071" />
               </div>
+            </div>
+
+            <div>
+              <label className="label">Geburtsdatum <span className="text-red-500">*</span></label>
+              <input className="input" type="date" value={form.birth_date} onChange={e => set('birth_date', e.target.value)} required />
             </div>
 
             <div>
