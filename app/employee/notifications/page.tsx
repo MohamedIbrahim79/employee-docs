@@ -61,6 +61,14 @@ export default function EmployeeNotifications() {
                     Öffnen
                   </Link>
                 )}
+                {n.metadata?.payslip_id && (
+                  <Link
+                    href="/employee/payslips"
+                    onClick={() => markAsRead(n.id)}
+                    className="btn-secondary py-1.5 px-3 text-xs shrink-0">
+                    Öffnen
+                  </Link>
+                )}
               </div>
             </div>
           ))}
