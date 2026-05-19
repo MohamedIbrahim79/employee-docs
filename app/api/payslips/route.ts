@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 
+const MONTHS = [
+  'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+  'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+]
+
 export async function GET(req: Request) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
@@ -65,6 +70,15 @@ export async function POST(req: Request) {
       .single()
 
     if (error) throw error
+
+    // إشعار داخلي للموظف
+    await supabaseAdmin.from('in_app_notifications').insert({
+      user_id: userId,
+      title: 'Neue Lohnabrechnung verfügbar',
+      message: `Ihre Lohnabrechnung für ${MONTHS[month - 1]} ${year} ist jetzt verfügbar`,
+      metadata: { payslip_id: data.id }
+    })
+
     return NextResponse.json(data, { status: 201 })
   } catch (e: any) {
     return NextResponse.json({ error: e.message || 'Serverfehler' }, { status: 500 })
