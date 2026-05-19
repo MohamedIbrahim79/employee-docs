@@ -25,9 +25,9 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
-    const { email, full_name, phone, start_date, birth_date, address, personal_nr } = body
+    const { email, start_date } = body
 
-    if (!email || !full_name) return NextResponse.json({ error: 'Name und E-Mail sind erforderlich' }, { status: 400 })
+    if (!email) return NextResponse.json({ error: 'E-Mail ist erforderlich' }, { status: 400 })
 
     const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-4).toUpperCase()
     const hash = await hashPassword(tempPassword)
@@ -36,14 +36,11 @@ export async function POST(req: Request) {
       .from('users')
       .insert({
         email: email.toLowerCase(),
-        full_name,
+        full_name: email.split('@')[0],
         password_hash: hash,
         role: 'employee',
-        phone,
         start_date: start_date || null,
-        birth_date: birth_date || null,
-        address: address || null,
-        personal_nr: personal_nr || null,
+        needs_profile_setup: true,
       })
       .select()
       .single()
@@ -57,7 +54,8 @@ export async function POST(req: Request) {
       )
     }
 
-    try { await sendWelcomeEmail(email, full_name, tempPassword) } catch {}
+    try { await sendWelcomeEmail(email, email.split('@')[0], tempPassword) } catch {}
+
     return NextResponse.json({ ...user2, temp_password: tempPassword }, { status: 201 })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })

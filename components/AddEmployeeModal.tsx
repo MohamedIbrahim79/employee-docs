@@ -8,9 +8,8 @@ interface Props {
 
 export default function AddEmployeeModal({ onClose, onDone }: Props) {
   const [form, setForm] = useState({
-    first_name: '', last_name: '', email: '', phone: '',
-    street: '', house_number: '', postal_code: '', city: '',
-    birth_date: '', start_date: '', personal_nr: ''
+    email: '',
+    start_date: '',
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -26,8 +25,6 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
   async function submit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true); setError('')
-    const full_name = `${form.first_name} ${form.last_name}`.trim()
-    const address = `${form.street} ${form.house_number}, ${form.postal_code} ${form.city}`.trim()
     const token = getToken()
     const res = await fetch('/api/employees', {
       method: 'POST',
@@ -36,13 +33,10 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
         'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
-        full_name,
         email: form.email,
-        phone: form.phone,
-        address,
-        birth_date: form.birth_date || null,
         start_date: form.start_date || null,
-        personal_nr: form.personal_nr || null,
+        full_name: form.email.split('@')[0], // اسم مؤقت
+        needs_profile_setup: true,
       }),
     })
     const data = await res.json()
@@ -54,7 +48,7 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
           <h2 className="font-bold text-gray-900 text-lg">Neuen Mitarbeiter hinzufügen</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-700 text-xl">✕</button>
@@ -71,68 +65,37 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
                   <code className="font-mono font-bold text-brand-800 text-base tracking-widest">{success.temp_password}</code>
                 </div>
               )}
+              <p className="text-xs text-gray-500 mt-3">Der Mitarbeiter wird beim ersten Login aufgefordert, sein Passwort und seine Daten zu vervollständigen.</p>
             </div>
             <button onClick={onClose} className="btn-primary w-full justify-center mt-4">Schließen</button>
           </div>
         ) : (
           <form onSubmit={submit} className="p-6 space-y-4" dir="ltr">
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="label">Vorname <span className="text-red-500">*</span></label>
-                <input className="input" value={form.first_name} onChange={e => set('first_name', e.target.value)} placeholder="Max" required />
-              </div>
-              <div>
-                <label className="label">Nachname <span className="text-red-500">*</span></label>
-                <input className="input" value={form.last_name} onChange={e => set('last_name', e.target.value)} placeholder="Mustermann" required />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <label className="label">E-Mail <span className="text-red-500">*</span></label>
-                <input className="input" type="email" value={form.email} onChange={e => set('email', e.target.value)} placeholder="max@schmeuser.de" required />
-              </div>
-              <div>
-                <label className="label">Telefon <span className="text-red-500">*</span></label>
-                <input className="input" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+49 ..." required />
-              </div>
-              <div>
-                <label className="label">Personal-Nr.</label>
-                <input className="input" value={form.personal_nr} onChange={e => set('personal_nr', e.target.value)} placeholder="01071" />
-              </div>
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-700">
+              Der Mitarbeiter wird per E-Mail eingeladen und vervollständigt seine Daten beim ersten Login selbst.
             </div>
 
             <div>
-              <label className="label">Geburtsdatum <span className="text-red-500">*</span></label>
-              <input className="input" type="date" value={form.birth_date} onChange={e => set('birth_date', e.target.value)} required />
-            </div>
-
-            <div>
-              <p className="text-sm font-semibold text-gray-700 mb-2">Adresse</p>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="col-span-2">
-                  <label className="label">Straße <span className="text-red-500">*</span></label>
-                  <input className="input" value={form.street} onChange={e => set('street', e.target.value)} placeholder="Musterstraße" required />
-                </div>
-                <div>
-                  <label className="label">Hausnummer <span className="text-red-500">*</span></label>
-                  <input className="input" value={form.house_number} onChange={e => set('house_number', e.target.value)} placeholder="12" required />
-                </div>
-                <div>
-                  <label className="label">PLZ <span className="text-red-500">*</span></label>
-                  <input className="input" value={form.postal_code} onChange={e => set('postal_code', e.target.value)} placeholder="12345" required />
-                </div>
-                <div className="col-span-2">
-                  <label className="label">Stadt <span className="text-red-500">*</span></label>
-                  <input className="input" value={form.city} onChange={e => set('city', e.target.value)} placeholder="Berlin" required />
-                </div>
-              </div>
+              <label className="label">E-Mail <span className="text-red-500">*</span></label>
+              <input
+                className="input"
+                type="email"
+                value={form.email}
+                onChange={e => set('email', e.target.value)}
+                placeholder="max@schmeuser.de"
+                required
+              />
             </div>
 
             <div>
               <label className="label">Eintrittsdatum <span className="text-red-500">*</span></label>
-              <input className="input" type="date" value={form.start_date} onChange={e => set('start_date', e.target.value)} required />
+              <input
+                className="input"
+                type="date"
+                value={form.start_date}
+                onChange={e => set('start_date', e.target.value)}
+                required
+              />
             </div>
 
             {error && <p className="text-red-600 text-sm bg-red-50 px-4 py-3 rounded-lg">{error}</p>}
@@ -140,7 +103,7 @@ export default function AddEmployeeModal({ onClose, onDone }: Props) {
             <div className="flex gap-3 pt-2">
               <button type="button" onClick={onClose} className="btn-secondary flex-1 justify-center">Abbrechen</button>
               <button type="submit" disabled={loading} className="btn-primary flex-1 justify-center">
-                {loading ? 'Wird hinzugefügt...' : 'Mitarbeiter hinzufügen'}
+                {loading ? 'Wird hinzugefügt...' : 'Einladen'}
               </button>
             </div>
           </form>
