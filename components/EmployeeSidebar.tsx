@@ -44,7 +44,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
 
   const links = [
     { href: '/employee', label: 'Meine Dokumente', icon: '📄', exact: true },
-    { href: '/employee/payslips', label: 'Lohnabrechnungen', icon: '💰' },
+    { href: '/employee/payslips', label: 'Meine Lohnabrechnung', icon: '💰' },
     { href: '/employee/notifications', label: 'Benachrichtigungen', icon: '🔔' },
     { href: '/employee/profile', label: 'Mein Profil', icon: '👤' },
   ]

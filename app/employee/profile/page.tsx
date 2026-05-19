@@ -129,9 +129,11 @@ export default function EmployeeProfile() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {[
                 { label: 'Vollständiger Name', value: user?.full_name },
+                { label: 'Personal-Nr.', value: user?.personal_nr },
                 { label: 'E-Mail', value: user?.email },
                 { label: 'Telefon', value: user?.phone },
                 { label: 'Geburtsdatum', value: user?.birth_date ? new Date(user.birth_date).toLocaleDateString('de-DE') : null },
+                { label: 'Eintrittsdatum', value: user?.start_date ? new Date(user.start_date).toLocaleDateString('de-DE') : null },
                 { label: 'Adresse', value: user?.address, full: true },
               ].map(item => (
                 <div key={item.label} className={item.full ? 'md:col-span-2' : ''}>
@@ -207,8 +209,6 @@ export default function EmployeeProfile() {
           </form>
         </div>
       </div>
-
-    
     </div>
   )
 }

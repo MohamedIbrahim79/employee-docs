@@ -97,6 +97,11 @@ export default function EmployeeDetail() {
               <span className={`badge ${employee.is_active ? 'badge-green' : 'badge-gray'}`}>
                 {employee.is_active ? 'Aktiv' : 'Inaktiv'}
               </span>
+              {employee.personal_nr && (
+                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                  Nr. {employee.personal_nr}
+                </span>
+              )}
             </div>
           </div>
           <div className="flex gap-1.5 flex-wrap">
@@ -135,6 +140,10 @@ export default function EmployeeDetail() {
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Vollständiger Name</p>
                 <p className="text-gray-900 font-medium">{employee.full_name || '—'}</p>
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Personal-Nr.</p>
+                <p className="text-gray-900">{employee.personal_nr || '—'}</p>
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">E-Mail</p>
