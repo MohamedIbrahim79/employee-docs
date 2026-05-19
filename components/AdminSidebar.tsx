@@ -51,6 +51,7 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
   const links = [
     { href: '/admin', label: 'Dashboard', icon: '📊', exact: true },
     { href: '/admin/employees', label: 'Mitarbeiter', icon: '👥' },
+    { href: '/admin/payslips', label: 'Lohnabrechnungen', icon: '💰' },
     { href: '/admin/alerts', label: 'Ablaufende Dokumente', icon: '🔔' },
     { href: '/admin/notifications', label: 'Benachrichtigungen', icon: '📩' },
     { href: '/admin/settings', label: 'Einstellungen', icon: '⚙️' },
