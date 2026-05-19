@@ -120,9 +120,9 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
           </button>
           <div className="flex items-center gap-2">
             <PyramidLogo size={8} />
-            <div>
+            <div className="text-center">
               <p className="font-bold text-white text-sm leading-tight">Schmeuser GmbH</p>
-              <p className="text-[#c9a84c] text-xs font-medium uppercase" style={{ letterSpacing: '0.15em' }}>Security Services</p>
+              <p className="text-[#c9a84c] font-medium" style={{ fontSize: '9px' }}>Security Services</p>
             </div>
           </div>
           <button onClick={handleBellClick} className="relative text-white p-1">
