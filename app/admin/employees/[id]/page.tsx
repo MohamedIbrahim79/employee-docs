@@ -20,6 +20,7 @@ export default function EmployeeDetail() {
   const [editingPersonalNr, setEditingPersonalNr] = useState(false)
   const [personalNr, setPersonalNr] = useState('')
   const [savingNr, setSavingNr] = useState(false)
+  const [personalNrError, setPersonalNrError] = useState('')
 
   function getToken() {
     return localStorage.getItem('auth_token') ||
@@ -72,7 +73,8 @@ export default function EmployeeDetail() {
 
   async function savePersonalNr() {
     setSavingNr(true)
-    await fetch(`/api/employees/${id}`, {
+    setPersonalNrError('')
+    const res = await fetch(`/api/employees/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify({
@@ -85,6 +87,12 @@ export default function EmployeeDetail() {
         personal_nr: personalNr
       })
     })
+    const data = await res.json()
+    if (!res.ok) {
+      setPersonalNrError(data.error)
+      setSavingNr(false)
+      return
+    }
     setEditingPersonalNr(false)
     setSavingNr(false)
     load()
@@ -169,22 +177,27 @@ export default function EmployeeDetail() {
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Personal-Nr.</p>
                 {editingPersonalNr ? (
-                  <div className="flex items-center gap-2 mt-1">
-                    <input
-                      type="text"
-                      className="input py-1.5 text-sm"
-                      value={personalNr}
-                      onChange={e => setPersonalNr(e.target.value)}
-                      placeholder="z.B. 01071"
-                      autoFocus
-                    />
-                    <button onClick={savePersonalNr} disabled={savingNr} className="btn-primary py-1.5 px-3 text-xs">
-                      {savingNr ? '...' : 'Speichern'}
-                    </button>
-                    <button onClick={() => { setEditingPersonalNr(false); setPersonalNr(employee.personal_nr || '') }}
-                      className="btn-secondary py-1.5 px-3 text-xs">
-                      ✕
-                    </button>
+                  <div className="mt-1 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        className="input py-1.5 text-sm"
+                        value={personalNr}
+                        onChange={e => { setPersonalNr(e.target.value); setPersonalNrError('') }}
+                        placeholder="z.B. 01071"
+                        autoFocus
+                      />
+                      <button onClick={savePersonalNr} disabled={savingNr} className="btn-primary py-1.5 px-3 text-xs">
+                        {savingNr ? '...' : 'Speichern'}
+                      </button>
+                      <button onClick={() => { setEditingPersonalNr(false); setPersonalNr(employee.personal_nr || ''); setPersonalNrError('') }}
+                        className="btn-secondary py-1.5 px-3 text-xs">
+                        ✕
+                      </button>
+                    </div>
+                    {personalNrError && (
+                      <p className="text-red-600 text-xs bg-red-50 px-3 py-2 rounded-lg">{personalNrError}</p>
+                    )}
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 mt-1">

@@ -31,13 +31,31 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session || !['admin', 'owner', 'hr'].includes(session.role)) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
+  if (!session || !['admin', 'owner', 'hr'].includes(session.role))
+    return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   const body = await req.json()
   const { full_name, position, department, phone, start_date, birth_date, address, is_active, personal_nr } = body
-const { data, error } = await supabaseAdmin
-  .from('users')
-  .update({ full_name, position, department, phone, start_date, birth_date, address, is_active, personal_nr })
+
+  // تحقق لو الـ personal_nr مكرر
+  if (personal_nr) {
+    const { data: existing } = await supabaseAdmin
+      .from('users')
+      .select('id')
+      .eq('personal_nr', personal_nr)
+      .neq('id', params.id)
+      .single()
+
+    if (existing) {
+      return NextResponse.json({
+        error: `Die Personal-Nr. ${personal_nr} ist bereits einem anderen Mitarbeiter zugewiesen.`
+      }, { status: 400 })
+    }
+  }
+
+  const { data, error } = await supabaseAdmin
+    .from('users')
+    .update({ full_name, position, department, phone, start_date, birth_date, address, is_active, personal_nr: personal_nr || null })
     .eq('id', params.id)
     .select()
     .single()
@@ -49,7 +67,8 @@ const { data, error } = await supabaseAdmin
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   const token = getTokenFromRequest(req)
   const session = token ? verifyToken(token) : null
-  if (!session || !['admin', 'owner', 'hr'].includes(session.role)) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
+  if (!session || !['admin', 'owner', 'hr'].includes(session.role))
+    return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   await supabaseAdmin.from('users').delete().eq('id', params.id)
   return NextResponse.json({ ok: true })
