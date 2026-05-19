@@ -17,6 +17,9 @@ export default function EmployeeDetail() {
     searchParams.get('tab') === 'docs' ? 'docs' : 'info'
   )
   const highlightDocId = searchParams.get('doc')
+  const [editingPersonalNr, setEditingPersonalNr] = useState(false)
+  const [personalNr, setPersonalNr] = useState('')
+  const [savingNr, setSavingNr] = useState(false)
 
   function getToken() {
     return localStorage.getItem('auth_token') ||
@@ -30,6 +33,7 @@ export default function EmployeeDetail() {
     })
     const data = await res.json()
     setEmployee(data)
+    setPersonalNr(data.personal_nr || '')
     setLoading(false)
   }
 
@@ -63,6 +67,18 @@ export default function EmployeeDetail() {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify({ ...employee, is_active: !employee.is_active })
     })
+    load()
+  }
+
+  async function savePersonalNr() {
+    setSavingNr(true)
+    await fetch(`/api/employees/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
+      body: JSON.stringify({ ...employee, personal_nr: personalNr })
+    })
+    setEditingPersonalNr(false)
+    setSavingNr(false)
     load()
   }
 
@@ -141,10 +157,39 @@ export default function EmployeeDetail() {
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Vollständiger Name</p>
                 <p className="text-gray-900 font-medium">{employee.full_name || '—'}</p>
               </div>
+
+              {/* Personal-Nr. مع إمكانية التعديل */}
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Personal-Nr.</p>
-                <p className="text-gray-900">{employee.personal_nr || '—'}</p>
+                {editingPersonalNr ? (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      className="input py-1.5 text-sm"
+                      value={personalNr}
+                      onChange={e => setPersonalNr(e.target.value)}
+                      placeholder="z.B. 01071"
+                      autoFocus
+                    />
+                    <button onClick={savePersonalNr} disabled={savingNr} className="btn-primary py-1.5 px-3 text-xs">
+                      {savingNr ? '...' : 'Speichern'}
+                    </button>
+                    <button onClick={() => { setEditingPersonalNr(false); setPersonalNr(employee.personal_nr || '') }} className="btn-secondary py-1.5 px-3 text-xs">
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <p className="text-gray-900">{employee.personal_nr || '—'}</p>
+                    <button
+                      onClick={() => setEditingPersonalNr(true)}
+                      className="text-xs text-brand-800 hover:underline">
+                      {employee.personal_nr ? 'Ändern' : '+ Hinzufügen'}
+                    </button>
+                  </div>
+                )}
               </div>
+
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">E-Mail</p>
                 <p className="text-gray-900">{employee.email || '—'}</p>

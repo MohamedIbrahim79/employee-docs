@@ -34,10 +34,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   if (!session || !['admin', 'owner', 'hr'].includes(session.role)) return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
 
   const body = await req.json()
-  const { full_name, position, department, phone, start_date, birth_date, address, is_active } = body
-  const { data, error } = await supabaseAdmin
-    .from('users')
-    .update({ full_name, position, department, phone, start_date, birth_date, address, is_active })
+  const { full_name, position, department, phone, start_date, birth_date, address, is_active, personal_nr } = body
+const { data, error } = await supabaseAdmin
+  .from('users')
+  .update({ full_name, position, department, phone, start_date, birth_date, address, is_active, personal_nr })
     .eq('id', params.id)
     .select()
     .single()
