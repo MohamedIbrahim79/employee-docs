@@ -19,6 +19,9 @@ export default function AdminPayslips() {
   const [msg, setMsg] = useState('')
   const [error, setError] = useState('')
   const [mode, setMode] = useState<'single' | 'bulk'>('single')
+  const [bulkFiles, setBulkFiles] = useState<File[]>([])
+  const [bulkResults, setBulkResults] = useState<any[]>([])
+  const [bulkUploading, setBulkUploading] = useState(false)
 
   function getToken() {
     return localStorage.getItem('auth_token') || ''
@@ -66,11 +69,6 @@ export default function AdminPayslips() {
     loadPayslips(selectedEmployee.id)
     setUploading(false)
   }
-
-  // Bulk upload
-  const [bulkFiles, setBulkFiles] = useState<File[]>([])
-  const [bulkResults, setBulkResults] = useState<any[]>([])
-  const [bulkUploading, setBulkUploading] = useState(false)
 
   function parsePersonalNr(filename: string): string | null {
     const match = filename.match(/^(\d+)_/)
@@ -130,7 +128,6 @@ export default function AdminPayslips() {
     <div className="p-4 md:p-8 max-w-3xl">
       <h1 className="page-title mb-6">Lohnabrechnungen</h1>
 
-      {/* Mode Toggle */}
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => setMode('single')}
@@ -140,7 +137,7 @@ export default function AdminPayslips() {
         <button
           onClick={() => setMode('bulk')}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${mode === 'bulk' ? 'bg-brand-800 text-white' : 'bg-white text-gray-600 border border-gray-200'}`}>
-          Massenupload
+          Alle Abrechnungen hochladen
         </button>
       </div>
 
@@ -240,7 +237,7 @@ export default function AdminPayslips() {
       ) : (
         <div className="card overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 bg-brand-900/5">
-            <h2 className="font-semibold text-brand-900">Massenupload</h2>
+            <h2 className="font-semibold text-brand-900">Alle Abrechnungen hochladen</h2>
             <p className="text-xs text-gray-500 mt-0.5">Dateiname muss mit Personal-Nr. beginnen (z.B. 01071_202510_...)</p>
           </div>
           <div className="p-6 space-y-4">
