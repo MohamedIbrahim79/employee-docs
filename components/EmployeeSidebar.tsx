@@ -72,7 +72,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
             <PyramidLogo />
             <div>
               <p className="font-bold text-white text-sm leading-tight">Schmeuser GmbH</p>
-              <p className="text-xs text-brand-400">Mitarbeiterportal</p>
+              <p className="text-[#c9a84c] font-medium" style={{ fontSize: '10px' }}>Security Services</p>
             </div>
           </div>
         </div>
@@ -122,7 +122,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
             <PyramidLogo size={8} />
             <div className="text-center">
               <p className="font-bold text-white text-sm leading-tight">Schmeuser GmbH</p>
-              <p className="text-[#c9a84c] font-medium" style={{ fontSize: '9px' }}>Security Services</p>
+              <p className="text-[#c9a84c] font-medium" style={{ fontSize: '11px' }}>Security Services</p>
             </div>
           </div>
           <button onClick={handleBellClick} className="relative text-white p-1">
@@ -148,7 +148,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
                 <PyramidLogo />
                 <div>
                   <p className="font-bold text-white text-sm leading-tight">Schmeuser GmbH</p>
-                  <p className="text-xs text-brand-400">Mitarbeiterportal</p>
+                  <p className="text-[#c9a84c] font-medium" style={{ fontSize: '10px' }}>Security Services</p>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} className="text-brand-400 hover:text-white p-1">
