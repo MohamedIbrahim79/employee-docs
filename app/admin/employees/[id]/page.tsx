@@ -75,7 +75,15 @@ export default function EmployeeDetail() {
     await fetch(`/api/employees/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-      body: JSON.stringify({ ...employee, personal_nr: personalNr })
+      body: JSON.stringify({
+        full_name: employee.full_name,
+        phone: employee.phone,
+        address: employee.address,
+        birth_date: employee.birth_date,
+        start_date: employee.start_date,
+        is_active: employee.is_active,
+        personal_nr: personalNr
+      })
     })
     setEditingPersonalNr(false)
     setSavingNr(false)
@@ -158,11 +166,10 @@ export default function EmployeeDetail() {
                 <p className="text-gray-900 font-medium">{employee.full_name || '—'}</p>
               </div>
 
-              {/* Personal-Nr. مع إمكانية التعديل */}
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">Personal-Nr.</p>
                 {editingPersonalNr ? (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-1">
                     <input
                       type="text"
                       className="input py-1.5 text-sm"
@@ -174,16 +181,17 @@ export default function EmployeeDetail() {
                     <button onClick={savePersonalNr} disabled={savingNr} className="btn-primary py-1.5 px-3 text-xs">
                       {savingNr ? '...' : 'Speichern'}
                     </button>
-                    <button onClick={() => { setEditingPersonalNr(false); setPersonalNr(employee.personal_nr || '') }} className="btn-secondary py-1.5 px-3 text-xs">
+                    <button onClick={() => { setEditingPersonalNr(false); setPersonalNr(employee.personal_nr || '') }}
+                      className="btn-secondary py-1.5 px-3 text-xs">
                       ✕
                     </button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mt-1">
                     <p className="text-gray-900">{employee.personal_nr || '—'}</p>
                     <button
                       onClick={() => setEditingPersonalNr(true)}
-                      className="text-xs text-brand-800 hover:underline">
+                      className="btn-secondary text-xs py-1 px-2.5">
                       {employee.personal_nr ? 'Ändern' : '+ Hinzufügen'}
                     </button>
                   </div>
