@@ -11,9 +11,20 @@ export async function POST(req: Request) {
 
     if (!file) return NextResponse.json({ error: 'Keine Datei' }, { status: 400 })
 
+    // PDF مش مدعوم في Claude Vision
+    if (file.type === 'application/pdf') {
+      return NextResponse.json({ error: 'PDF wird nicht unterstützt. Bitte laden Sie ein Foto (JPG oder PNG) hoch.' }, { status: 400 })
+    }
+
+    // تأكد إن الـ media type صح
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json({ error: 'Nur Bilder (JPG, PNG, WEBP) werden unterstützt.' }, { status: 400 })
+    }
+
     const buffer = await file.arrayBuffer()
     const base64 = Buffer.from(buffer).toString('base64')
-    const mediaType = file.type as 'image/jpeg' | 'image/png' | 'image/webp'
+    const mediaType = file.type as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
 
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
