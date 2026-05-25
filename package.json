@@ -9,6 +9,7 @@
     "cron": "node lib/cron.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.98.0",
     "@supabase/ssr": "^0.3.0",
     "@supabase/supabase-js": "^2.43.0",
     "bcryptjs": "^2.4.3",

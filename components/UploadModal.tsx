@@ -21,6 +21,8 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [progress, setProgress] = useState(0)
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiMsg, setAiMsg] = useState('')
 
   const [bankMode, setBankMode] = useState<'card' | 'iban'>('card')
   const [iban, setIban] = useState('')
@@ -38,7 +40,10 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
   const showExpiryDate = doc.document_type?.has_expiry && !isIssueDateOnly && !isNoDates && !isBankDoc
 
   const onDrop = useCallback((accepted: File[]) => {
-    if (accepted[0]) setFile(accepted[0])
+    if (accepted[0]) {
+      setFile(accepted[0])
+      setAiMsg('')
+    }
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -49,11 +54,31 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
     onDropRejected: () => setError('Datei nicht akzeptiert. Nur Bilder oder PDF bis 10MB erlaubt.'),
   })
 
+  async function extractWithAI() {
+    if (!file) { setError('Bitte zuerst eine Datei hochladen'); return }
+    setAiLoading(true); setAiMsg(''); setError('')
+
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('doc_type', docNameDe)
+
+    const res = await fetch('/api/ai-extract', { method: 'POST', body: fd })
+    const data = await res.json()
+
+    if (!res.ok) { setError(data.error || 'AI Fehler'); setAiLoading(false); return }
+
+    let found = false
+    if (data.expiry_date) { setExpiryDate(data.expiry_date); found = true }
+    if (data.issue_date) { setIssueDate(data.issue_date); found = true }
+
+    setAiMsg(found ? '✅ Daten erfolgreich erkannt!' : '⚠️ Keine Daten gefunden – bitte manuell eingeben')
+    setAiLoading(false)
+  }
+
   async function handleUpload() {
     const token = localStorage.getItem('auth_token') ||
       document.cookie.split('; ').find(r => r.startsWith('auth_token='))?.split('=')[1] || ''
 
-    // Bewacher ID mode
     if (isBewacherDoc) {
       if (!bewacherId.trim()) { setError('Bitte Bewacher-ID eingeben'); return }
       setUploading(true); setError(''); setProgress(50)
@@ -73,7 +98,6 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
       return
     }
 
-    // IBAN mode
     if (isBankDoc && bankMode === 'iban') {
       if (!iban) { setError('Bitte IBAN eingeben'); return }
       if (!ibanExpiry) { setError('Bitte Ablaufdatum eingeben'); return }
@@ -150,37 +174,27 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
 
         <div className="p-6 space-y-5">
 
-          {/* Bewacher ID */}
           {isBewacherDoc && (
             <div>
               <label className="label">Bewacher-ID Nummer <span className="text-red-500">*</span></label>
-              <input
-                className="input font-mono"
-                value={bewacherId}
-                onChange={e => setBewacherId(e.target.value)}
-                placeholder="z.B. 123456789"
-              />
+              <input className="input font-mono" value={bewacherId} onChange={e => setBewacherId(e.target.value)} placeholder="z.B. 123456789" />
               <p className="text-xs text-gray-400 mt-1">Geben Sie Ihre Bewacher-Identifikationsnummer ein</p>
             </div>
           )}
 
-          {/* Bank mode toggle */}
           {isBankDoc && (
             <div className="flex gap-2">
-              <button
-                onClick={() => setBankMode('card')}
+              <button onClick={() => setBankMode('card')}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${bankMode === 'card' ? 'bg-brand-800 text-white' : 'bg-gray-100 text-gray-600'}`}>
                 Bankkarte hochladen
               </button>
-              <button
-                onClick={() => setBankMode('iban')}
+              <button onClick={() => setBankMode('iban')}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${bankMode === 'iban' ? 'bg-brand-800 text-white' : 'bg-gray-100 text-gray-600'}`}>
                 IBAN eingeben
               </button>
             </div>
           )}
 
-          {/* IBAN Form */}
           {isBankDoc && bankMode === 'iban' ? (
             <div className="space-y-4">
               <div>
@@ -214,8 +228,7 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
                   {...getRootProps()}
                   className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
                     isDragActive ? 'border-brand-500 bg-brand-50' : file ? 'border-green-400 bg-green-50' : 'border-gray-200 hover:border-brand-300 hover:bg-brand-50'
-                  }`}
-                >
+                  }`}>
                   <input {...getInputProps()} />
                   {file ? (
                     <div>
@@ -230,7 +243,33 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-gray-400 mt-2">Nur klare Fotos oder PDFs. Maximale Dateigröße: 10 MB</p>
+
+                {/* AI Button */}
+                {file && !isNoDates && !isBankDoc && (
+                  <button
+                    onClick={extractWithAI}
+                    disabled={aiLoading}
+                    className="mt-3 w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2"
+                    style={{ background: 'linear-gradient(135deg, #1a2744, #2d3f6b)', color: 'white' }}>
+                    {aiLoading ? (
+                      <>
+                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
+                        KI liest das Dokument...
+                      </>
+                    ) : (
+                      <>✨ Daten automatisch erkennen (KI)</>
+                    )}
+                  </button>
+                )}
+
+                {aiMsg && (
+                  <p className={`text-sm mt-2 px-3 py-2 rounded-lg ${aiMsg.includes('✅') ? 'bg-green-50 text-green-700' : 'bg-yellow-50 text-yellow-700'}`}>
+                    {aiMsg}
+                  </p>
+                )}
               </div>
 
               {isBankDoc && (
