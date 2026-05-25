@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { fromBuffer } from 'pdf2pic'
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -11,20 +12,31 @@ export async function POST(req: Request) {
 
     if (!file) return NextResponse.json({ error: 'Keine Datei' }, { status: 400 })
 
-    // PDF مش مدعوم في Claude Vision
-    if (file.type === 'application/pdf') {
-      return NextResponse.json({ error: 'PDF wird nicht unterstützt. Bitte laden Sie ein Foto (JPG oder PNG) hoch.' }, { status: 400 })
-    }
-
-    // تأكد إن الـ media type صح
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf']
     if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ error: 'Nur Bilder (JPG, PNG, WEBP) werden unterstützt.' }, { status: 400 })
+      return NextResponse.json({ error: 'Nur Bilder oder PDF werden unterstützt.' }, { status: 400 })
     }
 
     const buffer = await file.arrayBuffer()
-    const base64 = Buffer.from(buffer).toString('base64')
-    const mediaType = file.type as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
+    let base64: string
+    let mediaType: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' = 'image/jpeg'
+
+    if (file.type === 'application/pdf') {
+      // حوّل الـ PDF لصورة
+      const convert = fromBuffer(Buffer.from(buffer), {
+        density: 150,
+        format: 'jpeg',
+        width: 1200,
+        height: 1700,
+      })
+      const result = await convert(1, { responseType: 'base64' })
+      if (!result.base64) throw new Error('PDF konnte nicht konvertiert werden')
+      base64 = result.base64
+      mediaType = 'image/jpeg'
+    } else {
+      base64 = Buffer.from(buffer).toString('base64')
+      mediaType = file.type as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
+    }
 
     const response = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
