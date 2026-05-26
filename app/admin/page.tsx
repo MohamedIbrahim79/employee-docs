@@ -85,7 +85,6 @@ export default async function AdminDashboard() {
             className={`stat-card ${s.border} ${s.bg} hover:-translate-y-1 cursor-pointer`}>
             <div className="text-sm font-semibold text-gray-500 mb-2">{s.label}</div>
             <div className={`text-3xl font-bold ${s.color}`}>{s.value}</div>
-            <p className="text-xs text-gray-400 mt-2">Klicken zum Anzeigen →</p>
           </Link>
         ))}
       </div>

@@ -123,7 +123,6 @@ export default function EmployeeDocs() {
             className={`stat-card ${s.border} ${s.bg} text-left cursor-pointer ${filter === s.filterKey ? s.active : ''}`}>
             <div className="text-sm font-semibold text-gray-500 mb-2">{s.label}</div>
             <div className={`text-3xl font-bold ${s.color}`}>{s.value}</div>
-            <p className="text-xs text-gray-400 mt-2">Klicken zum Filtern →</p>
           </button>
         ))}
       </div>
