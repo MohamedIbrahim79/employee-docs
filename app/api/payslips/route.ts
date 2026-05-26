@@ -1,11 +1,20 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import nodemailer from 'nodemailer'
 
 const MONTHS = [
   'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
   'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
 ]
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+})
 
 export async function GET(req: Request) {
   const token = getTokenFromRequest(req)
@@ -71,13 +80,62 @@ export async function POST(req: Request) {
 
     if (error) throw error
 
-    // إشعار داخلي للموظف
+    // جيب بيانات الموظف
+    const { data: employee } = await supabaseAdmin
+      .from('users')
+      .select('email, full_name')
+      .eq('id', userId)
+      .single()
+
+    // إشعار داخلي
     await supabaseAdmin.from('in_app_notifications').insert({
       user_id: userId,
       title: 'Neue Lohnabrechnung verfügbar',
       message: `Ihre Lohnabrechnung für ${MONTHS[month - 1]} ${year} ist jetzt verfügbar`,
       metadata: { payslip_id: data.id }
     })
+
+    // إيميل للموظف
+    if (employee?.email) {
+      try {
+        await transporter.sendMail({
+          from: `"Schmeuser GmbH" <${process.env.GMAIL_USER}>`,
+          to: employee.email,
+          subject: `Ihre Lohnabrechnung für ${MONTHS[month - 1]} ${year}`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <div style="background: #1a2744; padding: 30px; text-align: center; border-radius: 12px 12px 0 0;">
+                <h1 style="color: #c9a84c; margin: 0; font-size: 24px;">Schmeuser GmbH</h1>
+                <p style="color: white; margin: 5px 0 0;">Security Services</p>
+              </div>
+              <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 12px 12px;">
+                <p style="color: #333;">Sehr geehrte/r ${employee.full_name},</p>
+                <p style="color: #333;">Ihre Lohnabrechnung für <strong>${MONTHS[month - 1]} ${year}</strong> ist jetzt verfügbar.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${publicUrl}" 
+                     style="background: #1a2744; color: white; padding: 14px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                    Lohnabrechnung herunterladen
+                  </a>
+                </div>
+                <p style="color: #333;">Sie können Ihre Lohnabrechnung auch jederzeit in Ihrem persönlichen Portal einsehen:</p>
+                <div style="text-align: center; margin: 15px 0;">
+                  <a href="${process.env.NEXT_PUBLIC_SITE_URL}/employee/payslips"
+                     style="color: #1a2744; text-decoration: underline;">
+                    Zum Mitarbeiterportal
+                  </a>
+                </div>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                <p style="color: #999; font-size: 12px; text-align: center;">
+                  Schmeuser GmbH — Security Services
+                </p>
+              </div>
+            </div>
+          `
+        })
+      } catch (emailError) {
+        console.error('Email error:', emailError)
+      }
+    }
 
     return NextResponse.json(data, { status: 201 })
   } catch (e: any) {
