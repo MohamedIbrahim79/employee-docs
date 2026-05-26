@@ -138,7 +138,7 @@ export default function EmployeeDocs() {
         <div className="mb-4 flex items-center gap-2">
           <span className="text-sm text-gray-500">Filter aktiv:</span>
           <span className="text-sm font-medium text-brand-800">{stats.find(s => s.filterKey === filter)?.label}</span>
-          <button onClick={() => setFilter('all')} className="text-xs text-red-500 hover:underline">✕ Zurücksetzen</button>
+          <button onClick={() => setFilter('all')} className="btn-secondary text-xs py-1 px-3">Zurücksetzen</button>
         </div>
       )}
 
