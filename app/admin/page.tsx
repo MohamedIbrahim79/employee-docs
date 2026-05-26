@@ -35,6 +35,41 @@ async function getDashboardData() {
 export default async function AdminDashboard() {
   const { activeEmployees, alerts, uploaded, total, expired, expiringSoon } = await getDashboardData()
 
+  const stats = [
+    {
+      label: 'Mitarbeiter gesamt',
+      value: activeEmployees.length,
+      color: 'text-brand-700',
+      bg: 'bg-blue-50',
+      border: 'border-t-4 border-t-blue-500',
+      href: '/admin/employees'
+    },
+    {
+      label: 'Dokumente hochgeladen',
+      value: `${uploaded}/${total}`,
+      color: 'text-green-700',
+      bg: 'bg-green-50',
+      border: 'border-t-4 border-t-green-500',
+      href: '/admin/employees'
+    },
+    {
+      label: 'Läuft in 30 Tagen ab',
+      value: expiringSoon,
+      color: 'text-yellow-700',
+      bg: 'bg-yellow-50',
+      border: 'border-t-4 border-t-yellow-500',
+      href: '/admin/alerts'
+    },
+    {
+      label: 'Abgelaufen',
+      value: expired,
+      color: 'text-red-700',
+      bg: 'bg-red-50',
+      border: 'border-t-4 border-t-red-500',
+      href: '/admin/alerts'
+    },
+  ]
+
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -43,16 +78,15 @@ export default async function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-8">
-        {[
-          { label: 'Mitarbeiter gesamt', value: activeEmployees.length, color: 'text-brand-700' },
-          { label: 'Dokumente hochgeladen', value: `${uploaded}/${total}`, color: 'text-green-700' },
-          { label: 'Läuft in 30 Tagen ab', value: expiringSoon, color: 'text-yellow-700' },
-          { label: 'Abgelaufen', value: expired, color: 'text-red-700' },
-        ].map(s => (
-          <div key={s.label} className="stat-card">
+        {stats.map(s => (
+          <Link
+            key={s.label}
+            href={s.href}
+            className={`stat-card ${s.border} ${s.bg} hover:-translate-y-1 cursor-pointer`}>
             <div className="text-sm font-semibold text-gray-500 mb-2">{s.label}</div>
             <div className={`text-3xl font-bold ${s.color}`}>{s.value}</div>
-          </div>
+            <p className="text-xs text-gray-400 mt-2">Klicken zum Anzeigen →</p>
+          </Link>
         ))}
       </div>
 
