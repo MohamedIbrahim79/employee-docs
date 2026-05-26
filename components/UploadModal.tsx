@@ -68,7 +68,11 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
     if (!res.ok) { setError(data.error || 'AI Fehler'); setAiLoading(false); return }
 
     let found = false
-    if (data.expiry_date) { setExpiryDate(data.expiry_date); found = true }
+    if (data.expiry_date) {
+      setExpiryDate(data.expiry_date)
+      setIbanExpiry(data.expiry_date.substring(0, 7))
+      found = true
+    }
     if (data.issue_date) { setIssueDate(data.issue_date); found = true }
 
     setAiMsg(found ? '✅ Daten erfolgreich erkannt!' : '⚠️ Keine Daten gefunden – bitte manuell eingeben')
@@ -245,7 +249,7 @@ export default function UploadModal({ doc, userId, onClose, onDone }: Props) {
                 </div>
 
                 {/* AI Button */}
-                {file && !isNoDates && !isBankDoc && (
+                {file && !isNoDates && (
                   <button
                     onClick={extractWithAI}
                     disabled={aiLoading}
