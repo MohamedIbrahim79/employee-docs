@@ -78,7 +78,7 @@ export default function LoginPage() {
               </svg>
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-wide">Schmeuser GmbH</h1>
+          <h1 className="text-3xl font-bold text-white tracking-wide">Schmeuser Security GmbH</h1>
           <p className="text-[#c9a84c] text-sm mt-1 font-medium uppercase" style={{ letterSpacing: '0.25em' }}>Security Services</p>
           <p className="text-white/40 text-xs mt-3 tracking-wide">Mitarbeiter-Dokumentenverwaltung</p>
         </div>
