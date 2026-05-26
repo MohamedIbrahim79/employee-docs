@@ -74,7 +74,6 @@ export default function EmployeeDocs() {
       label: 'Hochgeladen',
       value: uploaded,
       color: 'text-green-700',
-      border: 'border-t-4 border-t-green-500',
       bg: 'bg-green-50',
       active: 'ring-2 ring-green-400',
       filterKey: 'uploaded' as const,
@@ -83,7 +82,6 @@ export default function EmployeeDocs() {
       label: 'Fehlend',
       value: missing,
       color: 'text-gray-600',
-      border: 'border-t-4 border-t-gray-400',
       bg: 'bg-gray-50',
       active: 'ring-2 ring-gray-400',
       filterKey: 'missing' as const,
@@ -92,7 +90,6 @@ export default function EmployeeDocs() {
       label: 'Läuft bald ab',
       value: expiring,
       color: 'text-yellow-700',
-      border: 'border-t-4 border-t-yellow-500',
       bg: 'bg-yellow-50',
       active: 'ring-2 ring-yellow-400',
       filterKey: 'expiring' as const,
@@ -101,7 +98,6 @@ export default function EmployeeDocs() {
       label: 'Abgelaufen',
       value: expired,
       color: 'text-red-700',
-      border: 'border-t-4 border-t-red-500',
       bg: 'bg-red-50',
       active: 'ring-2 ring-red-400',
       filterKey: 'expired' as const,
@@ -120,7 +116,7 @@ export default function EmployeeDocs() {
           <button
             key={s.label}
             onClick={() => setFilter(filter === s.filterKey ? 'all' : s.filterKey)}
-            className={`stat-card ${s.border} ${s.bg} text-left cursor-pointer ${filter === s.filterKey ? s.active : ''}`}>
+            className={`stat-card ${s.bg} text-left cursor-pointer ${filter === s.filterKey ? s.active : ''}`}>
             <div className="text-sm font-semibold text-gray-500 mb-2">{s.label}</div>
             <div className={`text-3xl font-bold ${s.color}`}>{s.value}</div>
           </button>

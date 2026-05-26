@@ -41,7 +41,6 @@ export default async function AdminDashboard() {
       value: activeEmployees.length,
       color: 'text-brand-700',
       bg: 'bg-blue-50',
-      border: 'border-t-4 border-t-blue-500',
       href: '/admin/employees'
     },
     {
@@ -49,7 +48,6 @@ export default async function AdminDashboard() {
       value: `${uploaded}/${total}`,
       color: 'text-green-700',
       bg: 'bg-green-50',
-      border: 'border-t-4 border-t-green-500',
       href: '/admin/employees'
     },
     {
@@ -57,7 +55,6 @@ export default async function AdminDashboard() {
       value: expiringSoon,
       color: 'text-yellow-700',
       bg: 'bg-yellow-50',
-      border: 'border-t-4 border-t-yellow-500',
       href: '/admin/alerts'
     },
     {
@@ -65,7 +62,6 @@ export default async function AdminDashboard() {
       value: expired,
       color: 'text-red-700',
       bg: 'bg-red-50',
-      border: 'border-t-4 border-t-red-500',
       href: '/admin/alerts'
     },
   ]
@@ -82,7 +78,7 @@ export default async function AdminDashboard() {
           <Link
             key={s.label}
             href={s.href}
-            className={`stat-card ${s.border} ${s.bg} hover:-translate-y-1 cursor-pointer`}>
+            className={`stat-card ${s.bg} hover:-translate-y-1 cursor-pointer`}>
             <div className="text-sm font-semibold text-gray-500 mb-2">{s.label}</div>
             <div className={`text-3xl font-bold ${s.color}`}>{s.value}</div>
           </Link>
