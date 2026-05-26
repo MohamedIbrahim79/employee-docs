@@ -6,7 +6,7 @@ import { LangProvider } from '@/components/LangProvider'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: 'Schmeuser GmbH',
+  title: 'Schmeuser Security GmbH',
   description: 'Verwaltung von Mitarbeiterdokumenten und automatischen Benachrichtigungen',
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' fill='%231a2744' rx='8'/><polygon points='20,4 36,32 4,32' fill='%23c9a84c' opacity='0.9'/><polygon points='20,10 32,32 8,32' fill='%231a2744'/><polygon points='20,16 28,32 12,32' fill='%23c9a84c' opacity='0.6'/></svg>",

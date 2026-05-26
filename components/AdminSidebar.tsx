@@ -80,7 +80,7 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
           <div className="flex items-center gap-3">
             <PyramidLogo />
             <div>
-              <p className="font-bold text-white text-sm leading-tight">Schmeuser GmbH</p>
+              <p className="font-bold text-white text-sm leading-tight">Schmeuser Security GmbH</p>
               <p className="text-[#c9a84c] font-medium" style={{ fontSize: '10px' }}>Security Services</p>
             </div>
           </div>
@@ -130,7 +130,7 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
           <div className="flex items-center gap-2">
             <PyramidLogo size={8} />
             <div className="text-center">
-              <p className="font-bold text-white text-sm leading-tight">Schmeuser GmbH</p>
+              <p className="font-bold text-white text-sm leading-tight">Schmeuser Security GmbH</p>
               <p className="text-[#c9a84c] font-medium" style={{ fontSize: '11px' }}>Security Services</p>
             </div>
           </div>
@@ -156,7 +156,7 @@ export default function AdminSidebar({ user }: { user: UserPayload }) {
               <div className="flex items-center gap-3">
                 <PyramidLogo />
                 <div>
-                  <p className="font-bold text-white text-sm leading-tight">Schmeuser GmbH</p>
+                  <p className="font-bold text-white text-sm leading-tight">Schmeuser Security GmbH</p>
                   <p className="text-[#c9a84c] font-medium" style={{ fontSize: '10px' }}>Security Services</p>
                 </div>
               </div>
