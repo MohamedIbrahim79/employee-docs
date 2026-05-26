@@ -73,7 +73,6 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
             <PyramidLogo />
             <div>
               <p className="font-bold text-white text-sm leading-tight">Schmeuser Security GmbH</p>
-              <p className="text-[#c9a84c] font-medium" style={{ fontSize: '10px' }}>Security Services</p>
             </div>
           </div>
         </div>
@@ -121,10 +120,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
           </button>
           <div className="flex items-center gap-2">
             <PyramidLogo size={8} />
-            <div className="text-center">
-              <p className="font-bold text-white text-sm leading-tight">Schmeuser Security GmbH</p>
-              <p className="text-[#c9a84c] font-medium" style={{ fontSize: '11px' }}>Security Services</p>
-            </div>
+            <p className="font-bold text-white text-sm leading-tight">Schmeuser Security GmbH</p>
           </div>
           <button onClick={handleBellClick} className="relative text-white p-1">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,10 +143,7 @@ export default function EmployeeSidebar({ user }: { user: UserPayload }) {
             <div className="p-5 border-b border-brand-800 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <PyramidLogo />
-                <div>
-                  <p className="font-bold text-white text-sm leading-tight">Schmeuser Security GmbH</p>
-                  <p className="text-[#c9a84c] font-medium" style={{ fontSize: '10px' }}>Security Services</p>
-                </div>
+                <p className="font-bold text-white text-sm leading-tight">Schmeuser Security GmbH</p>
               </div>
               <button onClick={() => setOpen(false)} className="text-brand-400 hover:text-white p-1">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

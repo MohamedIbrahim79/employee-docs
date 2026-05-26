@@ -41,7 +41,6 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #0f1a2e 0%, #1a2744 50%, #0f1a2e 100%)' }}>
 
-      {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-20 animate-pulse"
           style={{ background: 'radial-gradient(circle, #c9a84c, transparent)', animationDuration: '4s' }} />
@@ -53,7 +52,6 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md relative z-10">
 
-        {/* Logo */}
         <div
           className="text-center mb-8 transition-all duration-700"
           style={{
@@ -61,7 +59,6 @@ export default function LoginPage() {
             transform: mounted ? 'translateY(0)' : 'translateY(-20px)'
           }}>
           <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-5">
-            {/* Glow - خففناه */}
             <div className="absolute w-36 h-36 rounded-full"
               style={{ background: 'rgba(201,168,76,0.12)', filter: 'blur(35px)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
             <div className="relative z-10 flex items-center justify-center w-20 h-20 rounded-2xl"
@@ -79,11 +76,9 @@ export default function LoginPage() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-wide">Schmeuser Security GmbH</h1>
-          <p className="text-[#c9a84c] text-sm mt-1 font-medium uppercase" style={{ letterSpacing: '0.25em' }}>Security Services</p>
           <p className="text-white/40 text-xs mt-3 tracking-wide">Mitarbeiter-Dokumentenverwaltung</p>
         </div>
 
-        {/* Card */}
         <div
           className="rounded-2xl p-8 transition-all duration-700 delay-200"
           style={{
